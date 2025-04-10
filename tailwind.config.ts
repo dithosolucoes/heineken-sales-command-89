@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,15 +53,19 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				heineken: {
+					DEFAULT: '#00843D', // Heineken green
+					light: '#27AE60',
+					dark: '#006837',
+					neon: '#3EFF7F'
+				},
+				tactical: {
+					black: '#121212',
+					darkgray: '#1A1F2C',
+					gray: '#333333',
+					silver: '#9F9EA1',
+					bronze: '#CD7F32',
+					gold: '#FFD700'
 				}
 			},
 			borderRadius: {
@@ -70,25 +75,36 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' },
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' },
+				},
+				'radar-scan': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
+				},
+				'pulse-green': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.6' }
+				},
+				'tactical-fade': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'radar-scan': 'radar-scan 4s linear infinite',
+				'pulse-green': 'pulse-green 2s ease-in-out infinite',
+				'tactical-fade': 'tactical-fade 0.3s ease-out forwards'
+			},
+			backgroundImage: {
+				'grid-pattern': 'linear-gradient(rgba(62, 255, 127, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(62, 255, 127, 0.05) 1px, transparent 1px)',
+				'gradient-tactical': 'linear-gradient(180deg, rgba(0, 132, 61, 0.2) 0%, rgba(18, 18, 18, 0.9) 100%)',
 			}
 		}
 	},

@@ -68,9 +68,10 @@ const dummyClients = [
 
 interface MapProps {
   onSelectClient?: (client: any) => void;
+  className?: string;
 }
 
-const Map: React.FC<MapProps> = ({ onSelectClient }) => {
+const Map: React.FC<MapProps> = ({ onSelectClient, className = "" }) => {
   const [selectedClient, setSelectedClient] = useState<any | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -90,68 +91,113 @@ const Map: React.FC<MapProps> = ({ onSelectClient }) => {
   }, []);
   
   useEffect(() => {
-    // Initialize map if we have the ref and map isn't already initialized
-    if (mapRef.current && !leafletMap.current) {
-      // Create map centered on São Paulo, Brazil
-      leafletMap.current = L.map(mapRef.current).setView([-23.5505, -46.6333], 13);
-      
-      // Add OpenStreetMap tiles with custom styling to match the app
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors',
-        className: 'dark-map-tiles' // Will be styled via CSS
-      }).addTo(leafletMap.current);
-      
-      // Add client markers
-      dummyClients.forEach(client => {
-        // Create custom icon based on client tier
-        const markerIcon = L.divIcon({
-          className: 'custom-div-icon',
-          html: `<div class="marker-pin ${getTierColorClass(client.tier)}"></div>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15]
-        });
-        
-        // Create marker and add to map
-        const marker = L.marker([client.position.lat, client.position.lng], {
-          icon: markerIcon,
-          title: client.name
-        }).addTo(leafletMap.current!);
-        
-        // Add click handler
-        marker.on('click', () => {
-          handleClientClick(client);
-        });
-        
-        // Store reference to marker
-        markers.current[client.id] = marker;
+    if (!mapRef.current || leafletMap.current) return;
+
+    // Create map centered on São Paulo, Brazil
+    leafletMap.current = L.map(mapRef.current, {
+      zoomControl: false, // Move zoom control to a different position below
+      attributionControl: false, // Hide the attribution for cleaner look
+    }).setView([-23.5505, -46.6333], 13);
+    
+    // Add zoom control to bottom right
+    L.control.zoom({
+      position: 'bottomright'
+    }).addTo(leafletMap.current);
+    
+    // Add attribution control to bottom left with minimal styling
+    L.control.attribution({
+      position: 'bottomleft',
+      prefix: false
+    }).addAttribution('© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>').addTo(leafletMap.current);
+    
+    // Add OpenStreetMap tiles with custom styling to match the app
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      className: 'dark-map-tiles' // Will be styled via CSS
+    }).addTo(leafletMap.current);
+    
+    // Add client markers
+    dummyClients.forEach(client => {
+      // Create custom icon based on client tier
+      const markerIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div class="marker-pin ${getTierColorClass(client.tier)}"></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
       });
       
-      // Add custom styling to make map match the app theme
-      const style = document.createElement('style');
-      style.textContent = `
-        .dark-map-tiles {
-          filter: brightness(0.8) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3) brightness(0.8);
-        }
-        .marker-pin {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background-color: #fff;
-          cursor: pointer;
-          box-shadow: 0 0 0 2px rgba(0,0,0,0.3), 0 0 5px rgba(255,255,255,0.5);
-        }
-        .marker-pin.bg-tactical-bronze { background-color: #CD7F32; }
-        .marker-pin.bg-tactical-silver { background-color: #9F9EA1; }
-        .marker-pin.bg-tactical-gold { background-color: #FFD700; }
-        .marker-pin.bg-blue-400 { background-color: #60A5FA; }
-        .marker-pin:hover {
-          transform: scale(1.2);
-          transition: transform 0.2s;
-        }
-      `;
-      document.head.appendChild(style);
-    }
+      // Create marker and add to map
+      const marker = L.marker([client.position.lat, client.position.lng], {
+        icon: markerIcon,
+        title: client.name
+      }).addTo(leafletMap.current!);
+      
+      // Add click handler
+      marker.on('click', () => {
+        handleClientClick(client);
+      });
+      
+      // Store reference to marker
+      markers.current[client.id] = marker;
+    });
+    
+    // Add custom styling to make map match the app theme
+    const style = document.createElement('style');
+    style.textContent = `
+      .dark-map-tiles {
+        filter: brightness(0.8) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3) brightness(0.8);
+      }
+      .marker-pin {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #fff;
+        cursor: pointer;
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.3), 0 0 5px rgba(255,255,255,0.5);
+      }
+      .marker-pin.bg-tactical-bronze { background-color: #CD7F32; }
+      .marker-pin.bg-tactical-silver { background-color: #9F9EA1; }
+      .marker-pin.bg-tactical-gold { background-color: #FFD700; }
+      .marker-pin.bg-blue-400 { background-color: #60A5FA; }
+      .marker-pin:hover {
+        transform: scale(1.2);
+        transition: transform 0.2s;
+      }
+      .leaflet-control-attribution {
+        background: rgba(0, 0, 0, 0.5) !important;
+        color: #666 !important;
+        font-size: 10px !important;
+      }
+      .leaflet-control-attribution a {
+        color: #888 !important;
+      }
+      .leaflet-control-zoom {
+        border: none !important;
+        margin-right: 15px !important;
+        margin-bottom: 15px !important;
+      }
+      .leaflet-control-zoom a {
+        background-color: rgba(0, 0, 0, 0.6) !important;
+        color: #fff !important;
+        border: 1px solid rgba(62, 255, 127, 0.4) !important;
+      }
+      .leaflet-control-zoom a:hover {
+        background-color: rgba(62, 255, 127, 0.2) !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Resize handler to ensure map fills container when window changes
+    const handleResize = () => {
+      if (leafletMap.current) {
+        leafletMap.current.invalidateSize();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Run once to ensure proper initial sizing
+    setTimeout(handleResize, 250);
     
     // Cleanup function
     return () => {
@@ -159,6 +205,8 @@ const Map: React.FC<MapProps> = ({ onSelectClient }) => {
         leafletMap.current.remove();
         leafletMap.current = null;
       }
+      window.removeEventListener('resize', handleResize);
+      document.head.removeChild(style);
     };
   }, []);
   
@@ -189,9 +237,12 @@ const Map: React.FC<MapProps> = ({ onSelectClient }) => {
   };
 
   return (
-    <div className="relative w-full h-full tactical-panel overflow-hidden">
-      {/* Search bar */}
-      <div className="absolute top-4 left-4 right-4 z-10">
+    <div className={`absolute inset-0 ${className}`}>
+      {/* Map */}
+      <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" />
+      
+      {/* Search bar - Floating on top of map */}
+      <div className="absolute top-4 left-4 right-4 z-10 max-w-lg mx-auto">
         <div className="relative">
           <Input
             placeholder="Buscar cliente por nome ou endereço..."
@@ -202,9 +253,6 @@ const Map: React.FC<MapProps> = ({ onSelectClient }) => {
           <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-tactical-silver" />
         </div>
       </div>
-      
-      {/* Map */}
-      <div ref={mapRef} className="h-full w-full z-0" />
       
       {/* Legend */}
       <div className="absolute bottom-4 left-4 bg-tactical-black/80 border border-heineken/20 p-2 rounded-sm z-10">

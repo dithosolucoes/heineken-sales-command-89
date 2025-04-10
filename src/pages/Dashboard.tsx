@@ -97,45 +97,48 @@ const Dashboard = () => {
           {/* Main Panel - Map/Content */}
           <div className="lg:col-span-3 order-1 lg:order-2 flex flex-col">
             <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <Tabs defaultValue="mapa" className="w-full sm:w-auto" onValueChange={setActiveTab}>
-                <TabsList className="bg-tactical-darkgray/50 border border-heineken/20">
-                  <TabsTrigger value="mapa" className="data-[state=active]:bg-heineken data-[state=active]:text-white">
-                    <MapIcon size={14} className="mr-2" />
-                    Mapa
-                  </TabsTrigger>
-                  <TabsTrigger value="agenda" className="data-[state=active]:bg-heineken data-[state=active]:text-white">
-                    <Calendar size={14} className="mr-2" />
-                    Agenda
-                  </TabsTrigger>
-                  <TabsTrigger value="conquistas" className="data-[state=active]:bg-heineken data-[state=active]:text-white">
-                    <Award size={14} className="mr-2" />
-                    Conquistas
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+              <div className="w-full sm:w-auto">
+                <Tabs defaultValue="mapa" className="w-full" onValueChange={setActiveTab}>
+                  <TabsList className="bg-tactical-darkgray/50 border border-heineken/20">
+                    <TabsTrigger value="mapa" className="data-[state=active]:bg-heineken data-[state=active]:text-white">
+                      <MapIcon size={14} className="mr-2" />
+                      Mapa
+                    </TabsTrigger>
+                    <TabsTrigger value="agenda" className="data-[state=active]:bg-heineken data-[state=active]:text-white">
+                      <Calendar size={14} className="mr-2" />
+                      Agenda
+                    </TabsTrigger>
+                    <TabsTrigger value="conquistas" className="data-[state=active]:bg-heineken data-[state=active]:text-white">
+                      <Award size={14} className="mr-2" />
+                      Conquistas
+                    </TabsTrigger>
+                  </TabsList>
+                
+                  {/* MovedTabsContent inside the Tabs component */}
+                  <div className="flex-1 mt-4">
+                    <TabsContent value="mapa" className="h-full m-0">
+                      <Map />
+                    </TabsContent>
+                    <TabsContent value="agenda" className="h-full m-0">
+                      <div className="tactical-panel h-full flex flex-col items-center justify-center p-4">
+                        <Calendar size={48} className="text-heineken/40 mb-4" />
+                        <p className="text-tactical-silver text-sm">Agenda de visitas em breve</p>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="conquistas" className="h-full m-0">
+                      <div className="tactical-panel h-full flex flex-col items-center justify-center p-4">
+                        <Award size={48} className="text-heineken/40 mb-4" />
+                        <p className="text-tactical-silver text-sm">Conquistas em breve</p>
+                      </div>
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </div>
               
               <Button variant="outline" size="sm" className="border-heineken/30 text-tactical-silver hover:text-heineken">
                 <Filter size={14} className="mr-2" />
                 Filtrar Clientes
               </Button>
-            </div>
-            
-            <div className="flex-1">
-              <TabsContent value="mapa" className="h-full m-0">
-                <Map />
-              </TabsContent>
-              <TabsContent value="agenda" className="h-full m-0">
-                <div className="tactical-panel h-full flex flex-col items-center justify-center p-4">
-                  <Calendar size={48} className="text-heineken/40 mb-4" />
-                  <p className="text-tactical-silver text-sm">Agenda de visitas em breve</p>
-                </div>
-              </TabsContent>
-              <TabsContent value="conquistas" className="h-full m-0">
-                <div className="tactical-panel h-full flex flex-col items-center justify-center p-4">
-                  <Award size={48} className="text-heineken/40 mb-4" />
-                  <p className="text-tactical-silver text-sm">Conquistas em breve</p>
-                </div>
-              </TabsContent>
             </div>
           </div>
         </div>

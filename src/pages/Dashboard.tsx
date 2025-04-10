@@ -17,7 +17,7 @@ const missions = [
     description: "Visite e converta 5 clientes no Cluster 9 para aumentar a presença da marca.",
     progress: 3,
     total: 5,
-    priority: "high",
+    priority: "high" as const, // Utilizando type assertion para garantir o tipo correto
     deadline: "15/04/2025"
   },
   {
@@ -26,7 +26,7 @@ const missions = [
     description: "Introduza Heineken 0.0 em 3 estabelecimentos premium.",
     progress: 1,
     total: 3,
-    priority: "medium",
+    priority: "medium" as const, // Utilizando type assertion para garantir o tipo correto
     deadline: "20/04/2025"
   },
   {
@@ -35,7 +35,7 @@ const missions = [
     description: "Verifique a qualidade dos displays em 8 PDVs estratégicos.",
     progress: 4,
     total: 8,
-    priority: "low",
+    priority: "low" as const, // Utilizando type assertion para garantir o tipo correto
     deadline: "30/04/2025"
   }
 ];

@@ -1,9 +1,15 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MapPin, Store, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ClientDetailsPanel from "./ClientDetailsPanel";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Corrigir o problema com os ícones do Leaflet
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // Dummy data for demonstration
 const dummyClients = [
@@ -11,7 +17,7 @@ const dummyClients = [
     id: "1",
     name: "Bar do Zé",
     type: "bar",
-    position: { x: 20, y: 30 },
+    position: { lat: -23.5505, lng: -46.6333 }, // São Paulo
     cluster: 9,
     tier: "prata",
     address: "Av. Paulista, 1000, São Paulo",
@@ -24,7 +30,7 @@ const dummyClients = [
     id: "2",
     name: "Padaria Estrela",
     type: "padaria",
-    position: { x: 60, y: 40 },
+    position: { lat: -23.5605, lng: -46.6233 }, // Próximo a SP
     cluster: 9,
     tier: "bronze",
     address: "Rua Augusta, 500, São Paulo",
@@ -37,7 +43,7 @@ const dummyClients = [
     id: "3",
     name: "Supermercado Azul",
     type: "mercado",
-    position: { x: 75, y: 65 },
+    position: { lat: -23.5405, lng: -46.6433 }, // Outro ponto em SP
     cluster: 7,
     tier: "ouro",
     address: "Av. Rebouças, 2000, São Paulo",
@@ -50,7 +56,7 @@ const dummyClients = [
     id: "4",
     name: "Bar e Restaurante Maravilha",
     type: "restaurante",
-    position: { x: 30, y: 70 },
+    position: { lat: -23.5705, lng: -46.6533 }, // Mais um ponto em SP
     cluster: 8,
     tier: "diamante",
     address: "Rua Oscar Freire, 300, São Paulo",
@@ -68,6 +74,93 @@ const Map: React.FC<MapProps> = ({ onSelectClient }) => {
   const [selectedClient, setSelectedClient] = useState<any | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const mapRef = useRef<HTMLDivElement>(null);
+  const leafletMap = useRef<L.Map | null>(null);
+  const markers = useRef<{[key: string]: L.Marker}>({});
+  
+  // Fixing default icon issue in Leaflet
+  useEffect(() => {
+    delete L.Icon.Default.prototype._getIconUrl;
+    
+    L.Icon.Default.mergeOptions({
+      iconUrl: icon,
+      iconRetinaUrl: icon,
+      shadowUrl: iconShadow
+    });
+  }, []);
+  
+  useEffect(() => {
+    // Initialize map if we have the ref and map isn't already initialized
+    if (mapRef.current && !leafletMap.current) {
+      // Create map centered on São Paulo, Brazil
+      leafletMap.current = L.map(mapRef.current).setView([-23.5505, -46.6333], 13);
+      
+      // Add OpenStreetMap tiles with custom styling to match the app
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors',
+        className: 'dark-map-tiles' // Will be styled via CSS
+      }).addTo(leafletMap.current);
+      
+      // Add client markers
+      dummyClients.forEach(client => {
+        // Create custom icon based on client tier
+        const markerIcon = L.divIcon({
+          className: 'custom-div-icon',
+          html: `<div class="marker-pin ${getTierColorClass(client.tier)}"></div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+        
+        // Create marker and add to map
+        const marker = L.marker([client.position.lat, client.position.lng], {
+          icon: markerIcon,
+          title: client.name
+        }).addTo(leafletMap.current!);
+        
+        // Add click handler
+        marker.on('click', () => {
+          handleClientClick(client);
+        });
+        
+        // Store reference to marker
+        markers.current[client.id] = marker;
+      });
+      
+      // Add custom styling to make map match the app theme
+      const style = document.createElement('style');
+      style.textContent = `
+        .dark-map-tiles {
+          filter: brightness(0.8) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3) brightness(0.8);
+        }
+        .marker-pin {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background-color: #fff;
+          cursor: pointer;
+          box-shadow: 0 0 0 2px rgba(0,0,0,0.3), 0 0 5px rgba(255,255,255,0.5);
+        }
+        .marker-pin.bg-tactical-bronze { background-color: #CD7F32; }
+        .marker-pin.bg-tactical-silver { background-color: #9F9EA1; }
+        .marker-pin.bg-tactical-gold { background-color: #FFD700; }
+        .marker-pin.bg-blue-400 { background-color: #60A5FA; }
+        .marker-pin:hover {
+          transform: scale(1.2);
+          transition: transform 0.2s;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Cleanup function
+    return () => {
+      if (leafletMap.current) {
+        leafletMap.current.remove();
+        leafletMap.current = null;
+      }
+    };
+  }, []);
   
   const handleClientClick = (client: any) => {
     setSelectedClient(client);
@@ -80,7 +173,7 @@ const Map: React.FC<MapProps> = ({ onSelectClient }) => {
     setIsDialogOpen(false);
   };
 
-  const getTierColor = (tier: string) => {
+  const getTierColorClass = (tier: string) => {
     switch(tier) {
       case "diamante":
         return "bg-blue-400";
@@ -111,42 +204,10 @@ const Map: React.FC<MapProps> = ({ onSelectClient }) => {
       </div>
       
       {/* Map */}
-      <div 
-        className="h-full w-full heineken-grid-bg flex items-center justify-center"
-        style={{ backgroundSize: '40px 40px' }}
-      >
-        {/* This is a placeholder for the actual map */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-tactical-silver opacity-20 select-none">
-            <MapPin size={48} />
-            <p className="text-sm mt-2">SP SUL</p>
-          </div>
-        </div>
-        
-        {/* Client markers */}
-        {dummyClients.map((client) => (
-          <div
-            key={client.id}
-            className="absolute cursor-pointer group"
-            style={{ 
-              left: `${client.position.x}%`, 
-              top: `${client.position.y}%`,
-            }}
-            onClick={() => handleClientClick(client)}
-          >
-            <div 
-              className={`w-3 h-3 rounded-full ${getTierColor(client.tier)} group-hover:scale-125 transition-transform duration-200`}
-              style={{ boxShadow: '0 0 0 2px rgba(0,0,0,0.3), 0 0 5px rgba(255,255,255,0.5)' }}
-            />
-            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 bg-tactical-darkgray/90 px-2 py-0.5 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-              {client.name}
-            </div>
-          </div>
-        ))}
-      </div>
+      <div ref={mapRef} className="h-full w-full z-0" />
       
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-tactical-black/80 border border-heineken/20 p-2 rounded-sm">
+      <div className="absolute bottom-4 left-4 bg-tactical-black/80 border border-heineken/20 p-2 rounded-sm z-10">
         <p className="text-xs text-tactical-silver mb-1">Cliente por tier:</p>
         <div className="flex items-center space-x-3">
           <div className="flex items-center">

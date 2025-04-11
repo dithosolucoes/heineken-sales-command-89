@@ -45,18 +45,21 @@ const Dashboard = () => {
   
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-tactical-black">
-      {/* Mapa como background - sempre visível com interatividade condicionada pela tab ativa */}
-      <div className="absolute inset-0">
-        <Map className={`${activeTab === "mapa" ? "pointer-events-auto" : "pointer-events-none"}`} />
+      {/* Map container with absolute positioning */}
+      <div className="absolute inset-0 z-0">
+        <Map className={activeTab === "mapa" ? "pointer-events-auto" : "pointer-events-none"} />
       </div>
       
-      {/* Conteúdo principal sobreposto */}
-      <div className="flex flex-col min-h-screen z-10 relative">
-        <Header />
+      {/* Content overlay - Using pointer-events-none when map is active */}
+      <div className={`flex flex-col min-h-screen relative ${activeTab === "mapa" ? "pointer-events-none" : "pointer-events-auto"}`}>
+        {/* Header always needs pointer events */}
+        <div className="pointer-events-auto">
+          <Header />
+        </div>
 
         <div className="flex-1 flex flex-col container mx-auto px-4 py-6 max-w-7xl">
-          {/* Status Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Status Bar - needs pointer events */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pointer-events-auto">
             <div className="tactical-panel p-4">
               <h3 className="text-xs text-tactical-silver mb-1 flex items-center">
                 <TrendingUp size={14} className="mr-1" />
@@ -97,13 +100,13 @@ const Dashboard = () => {
           {/* Main Content */}
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left Panel - Missions */}
-            <div className="lg:col-span-1 order-2 lg:order-1">
+            <div className="lg:col-span-1 order-2 lg:order-1 pointer-events-auto">
               <MissionPanel missions={missions} />
             </div>
             
             {/* Main Panel - Content */}
             <div className="lg:col-span-3 order-1 lg:order-2 flex flex-col">
-              <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pointer-events-auto">
                 <div className="w-full sm:w-auto">
                   <Tabs defaultValue="mapa" className="w-full" onValueChange={setActiveTab}>
                     <TabsList className="bg-tactical-darkgray/50 border border-heineken/20">
@@ -121,11 +124,11 @@ const Dashboard = () => {
                       </TabsTrigger>
                     </TabsList>
                   
-                    {/* TabsContent */}
+                    {/* TabsContent - Empty for map tab to allow clicking through */}
                     <div className="flex-1 mt-4">
-                      {/* Tab Mapa - Mantém espaço para interatividade do mapa de fundo */}
-                      <TabsContent value="mapa" className="h-[400px] m-0 pointer-events-none">
-                        {/* Mantém espaço vazio mas transparente para interação com o mapa */}
+                      {/* Tab Mapa - Completely empty to ensure map interaction */}
+                      <TabsContent value="mapa" className="m-0 h-[400px] opacity-0">
+                        {/* Empty on purpose to let clicks reach the map */}
                       </TabsContent>
                       <TabsContent value="agenda" className="h-[400px] m-0">
                         <div className="tactical-panel h-full flex flex-col items-center justify-center p-4">
@@ -153,7 +156,7 @@ const Dashboard = () => {
           
           {/* Tactical footer - Only visible in map view */}
           {activeTab === "mapa" && (
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 pointer-events-auto">
               <div className="tactical-panel p-4 flex items-center">
                 <Radar />
                 <div className="ml-4">

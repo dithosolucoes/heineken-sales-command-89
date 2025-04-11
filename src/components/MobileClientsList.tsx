@@ -37,7 +37,7 @@ const MobileClientsList: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-3 sticky top-0 z-10">
+      <div className="mb-3">
         <div className="relative">
           <Input
             placeholder="Buscar cliente..."
@@ -49,7 +49,7 @@ const MobileClientsList: React.FC = () => {
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto space-y-2 pb-16">
+      <div className="flex-1 overflow-y-auto space-y-2">
         {sortedClients.length === 0 ? (
           <div className="text-center py-4 text-tactical-silver">
             <p className="text-sm">Nenhum cliente encontrado</p>

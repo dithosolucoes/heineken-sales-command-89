@@ -11,7 +11,7 @@ import {
   DollarSign, 
   Refrigerator, 
   Shield, 
-  Bottle, 
+  Wine, 
   Compass,
   MapPin,
   Building2,
@@ -45,7 +45,7 @@ interface ClientDetails {
     city: string;
     zipCode: string;
   };
-  location: {
+  position: {
     lat: number;
     lng: number;
   };
@@ -172,7 +172,7 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
             {/* Vasilhame */}
             <div className="flex items-center justify-between p-3 bg-tactical-darkgray/50 rounded-sm">
               <div className="flex items-center">
-                <Bottle className="h-5 w-5 text-heineken mr-2" />
+                <Wine className="h-5 w-5 text-heineken mr-2" />
                 <span className="text-sm text-tactical-silver">VASILHAME:</span>
               </div>
               <span className="text-sm text-heineken-neon">{client.bottle ? "SIM" : "NÃO"}</span>
@@ -207,9 +207,9 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                   <span className="text-tactical-silver">CEP: {client.address.zipCode}</span>
                 </div>
                 <div className="flex items-start text-xs text-tactical-silver/70 mt-1">
-                  <span>LAT: {client.location.lat.toFixed(5)}</span>
+                  <span>LAT: {client.position.lat.toFixed(5)}</span>
                   <span className="mx-2">•</span>
-                  <span>LONG: {client.location.lng.toFixed(5)}</span>
+                  <span>LONG: {client.position.lng.toFixed(5)}</span>
                 </div>
               </div>
             </div>

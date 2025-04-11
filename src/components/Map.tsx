@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { MapPin, Store, Search, Gamepad, Utensils, Coffee, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";

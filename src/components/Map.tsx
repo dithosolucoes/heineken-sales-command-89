@@ -1,9 +1,10 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import { MapPin, Store, Search } from "lucide-react";
+import { MapPin, Store, Search, Gamepad, Utensils, Coffee, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import ClientDetailsPanel from "./ClientDetailsPanel";
+import ClientDetailsModal from "./ClientDetailsModal";
+import { clientsData, getPotentialColor } from "@/utils/clientData";
+import { ClientData } from "@/types/client";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -11,69 +12,13 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Dummy data for demonstration
-const dummyClients = [
-  {
-    id: "1",
-    name: "Bar do Zé",
-    type: "bar",
-    position: { lat: -23.5505, lng: -46.6333 }, // São Paulo
-    cluster: 9,
-    tier: "prata",
-    address: "Av. Paulista, 1000, São Paulo",
-    phone: "(11) 99999-9999",
-    products: ["Heineken 600ml", "Heineken 0.0", "Heineken Long Neck"],
-    observations: ["Cliente sensível a preço", "Preferência por displays"],
-    lastVisit: "10/03/2025"
-  },
-  {
-    id: "2",
-    name: "Padaria Estrela",
-    type: "padaria",
-    position: { lat: -23.5605, lng: -46.6233 }, // Próximo a SP
-    cluster: 9,
-    tier: "bronze",
-    address: "Rua Augusta, 500, São Paulo",
-    phone: "(11) 98888-8888",
-    products: ["Heineken Long Neck", "Amstel"],
-    observations: ["Concorrência forte", "Potencial para expansão"],
-    lastVisit: "05/03/2025"
-  },
-  {
-    id: "3",
-    name: "Supermercado Azul",
-    type: "mercado",
-    position: { lat: -23.5405, lng: -46.6433 }, // Outro ponto em SP
-    cluster: 7,
-    tier: "ouro",
-    address: "Av. Rebouças, 2000, São Paulo",
-    phone: "(11) 97777-7777",
-    products: ["Heineken Lata", "Eisenbahn", "Lagunitas"],
-    observations: ["Cliente VIP", "Possibilidade de merchandising"],
-    lastVisit: "08/03/2025"
-  },
-  {
-    id: "4",
-    name: "Bar e Restaurante Maravilha",
-    type: "restaurante",
-    position: { lat: -23.5705, lng: -46.6533 }, // Mais um ponto em SP
-    cluster: 8,
-    tier: "diamante",
-    address: "Rua Oscar Freire, 300, São Paulo",
-    phone: "(11) 96666-6666",
-    products: ["Heineken Pack Premium", "Heineken 0.0", "Draft"],
-    observations: ["Parceiro estratégico", "Excelente exposição de marca"],
-  }
-];
-
 interface MapProps {
-  onSelectClient?: (client: any) => void;
   className?: string;
 }
 
-const Map: React.FC<MapProps> = ({ onSelectClient, className = "" }) => {
-  const [selectedClient, setSelectedClient] = useState<any | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const Map: React.FC<MapProps> = ({ className = "" }) => {
+  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
@@ -117,14 +62,9 @@ const Map: React.FC<MapProps> = ({ onSelectClient, className = "" }) => {
     }).addTo(leafletMap.current);
     
     // Add client markers
-    dummyClients.forEach(client => {
-      // Create custom icon based on client tier
-      const markerIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div class="marker-pin ${getTierColorClass(client.tier)}"></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      });
+    clientsData.forEach(client => {
+      // Create custom icon based on client potential and category
+      const markerIcon = createClientIcon(client);
       
       // Create marker and add to map
       const marker = L.marker([client.position.lat, client.position.lng], {
@@ -154,15 +94,47 @@ const Map: React.FC<MapProps> = ({ onSelectClient, className = "" }) => {
         background-color: #fff;
         cursor: pointer;
         box-shadow: 0 0 0 2px rgba(0,0,0,0.3), 0 0 5px rgba(255,255,255,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: bold;
       }
+      .marker-icon {
+        background-size: contain;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .marker-icon:hover {
+        transform: scale(1.2);
+        z-index: 1000;
+      }
+      .marker-icon > div {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+      .marker-icon.bar { background-color: rgba(33, 33, 33, 0.8); }
+      .marker-icon.restaurante { background-color: rgba(33, 33, 33, 0.8); }
+      .marker-icon.mercado { background-color: rgba(33, 33, 33, 0.8); }
+      .marker-icon.padaria { background-color: rgba(33, 33, 33, 0.8); }
+      .marker-icon.entretenimento { background-color: rgba(33, 33, 33, 0.8); }
+      .marker-icon.lanchonete { background-color: rgba(33, 33, 33, 0.8); }
+      
       .marker-pin.bg-tactical-bronze { background-color: #CD7F32; }
       .marker-pin.bg-tactical-silver { background-color: #9F9EA1; }
       .marker-pin.bg-tactical-gold { background-color: #FFD700; }
       .marker-pin.bg-blue-400 { background-color: #60A5FA; }
-      .marker-pin:hover {
-        transform: scale(1.2);
-        transition: transform 0.2s;
-      }
+      
       .leaflet-control-attribution {
         background: rgba(0, 0, 0, 0.5) !important;
         color: #666 !important;
@@ -210,30 +182,56 @@ const Map: React.FC<MapProps> = ({ onSelectClient, className = "" }) => {
     };
   }, []);
   
-  const handleClientClick = (client: any) => {
+  // Função para criar ícone personalizado para o cliente
+  const createClientIcon = (client: ClientData) => {
+    const potentialClass = getPotentialColor(client.potential);
+    
+    // HTML para o ícone personalizado baseado na categoria
+    const iconHtml = `
+      <div class="marker-icon ${client.type}">
+        <div class="marker-pin ${potentialClass}"></div>
+      </div>
+    `;
+    
+    return L.divIcon({
+      html: iconHtml,
+      className: '',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+  };
+  
+  const handleClientClick = (client: ClientData) => {
     setSelectedClient(client);
-    setIsDialogOpen(true);
-    if (onSelectClient) onSelectClient(client);
+    setIsModalOpen(true);
   };
 
   const handleConfirmVisit = (clientId: string) => {
     console.log(`Visit confirmed for client ${clientId}`);
-    setIsDialogOpen(false);
+    setIsModalOpen(false);
   };
 
-  const getTierColorClass = (tier: string) => {
-    switch(tier) {
-      case "diamante":
-        return "bg-blue-400";
-      case "ouro":
-        return "bg-tactical-gold";
-      case "prata":
-        return "bg-tactical-silver";
-      case "bronze":
-        return "bg-tactical-bronze";
-      default:
-        return "bg-tactical-silver";
-    }
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    
+    // Filter markers based on search term
+    Object.entries(markers.current).forEach(([id, marker]) => {
+      const client = clientsData.find(c => c.id === id);
+      if (!client) return;
+      
+      const isVisible = 
+        client.name.toLowerCase().includes(term) || 
+        client.address.street.toLowerCase().includes(term) ||
+        client.address.neighborhood.toLowerCase().includes(term) ||
+        client.address.city.toLowerCase().includes(term);
+      
+      if (isVisible) {
+        leafletMap.current?.addLayer(marker);
+      } else {
+        leafletMap.current?.removeLayer(marker);
+      }
+    });
   };
 
   return (
@@ -247,7 +245,7 @@ const Map: React.FC<MapProps> = ({ onSelectClient, className = "" }) => {
           <Input
             placeholder="Buscar cliente por nome ou endereço..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearch}
             className="bg-tactical-black/80 border-heineken/30 pl-9 pr-4 py-2 text-sm text-white w-full"
           />
           <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-tactical-silver" />
@@ -277,16 +275,13 @@ const Map: React.FC<MapProps> = ({ onSelectClient, className = "" }) => {
         </div>
       </div>
       
-      {/* Client details dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-tactical-black border-heineken/30 p-0 max-w-md">
-          <ClientDetailsPanel 
-            client={selectedClient} 
-            onClose={() => setIsDialogOpen(false)} 
-            onConfirmVisit={handleConfirmVisit} 
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Client details modal */}
+      <ClientDetailsModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        client={selectedClient}
+        onConfirmVisit={handleConfirmVisit}
+      />
     </div>
   );
 };

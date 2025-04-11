@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Header from "@/components/Header";
 import Map from "@/components/Map";
@@ -10,41 +9,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
 // Dummy data for missions
-const missions = [
-  {
-    id: "mission1",
-    title: "Conquiste o Cluster 9",
-    description: "Visite e converta 5 clientes no Cluster 9 para aumentar a presença da marca.",
-    progress: 3,
-    total: 5,
-    priority: "high" as const,
-    deadline: "15/04/2025"
-  },
-  {
-    id: "mission2",
-    title: "Expansão de Mix",
-    description: "Introduza Heineken 0.0 em 3 estabelecimentos premium.",
-    progress: 1,
-    total: 3,
-    priority: "medium" as const,
-    deadline: "20/04/2025"
-  },
-  {
-    id: "mission3",
-    title: "Manutenção de PDV",
-    description: "Verifique a qualidade dos displays em 8 PDVs estratégicos.",
-    progress: 4,
-    total: 8,
-    priority: "low" as const,
-    deadline: "30/04/2025"
-  }
-];
-
+const missions = [{
+  id: "mission1",
+  title: "Conquiste o Cluster 9",
+  description: "Visite e converta 5 clientes no Cluster 9 para aumentar a presença da marca.",
+  progress: 3,
+  total: 5,
+  priority: "high" as const,
+  deadline: "15/04/2025"
+}, {
+  id: "mission2",
+  title: "Expansão de Mix",
+  description: "Introduza Heineken 0.0 em 3 estabelecimentos premium.",
+  progress: 1,
+  total: 3,
+  priority: "medium" as const,
+  deadline: "20/04/2025"
+}, {
+  id: "mission3",
+  title: "Manutenção de PDV",
+  description: "Verifique a qualidade dos displays em 8 PDVs estratégicos.",
+  progress: 4,
+  total: 8,
+  priority: "low" as const,
+  deadline: "30/04/2025"
+}];
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("mapa");
-  
-  return (
-    <div className="flex flex-col min-h-screen relative overflow-hidden bg-tactical-black">
+  return <div className="flex flex-col min-h-screen relative overflow-hidden bg-tactical-black">
       {/* Map container with absolute positioning */}
       <div className="absolute inset-0 z-0">
         <Map className={activeTab === "mapa" ? "pointer-events-auto" : "pointer-events-none"} />
@@ -127,7 +119,7 @@ const Dashboard = () => {
                     {/* TabsContent - Empty for map tab to allow clicking through */}
                     <div className="flex-1 mt-4">
                       {/* Tab Mapa - Completely empty to ensure map interaction */}
-                      <TabsContent value="mapa" className="m-0 h-[400px] opacity-0">
+                      <TabsContent value="mapa" className="m-0 h-[1px] opacity-0">
                         {/* Empty on purpose to let clicks reach the map */}
                       </TabsContent>
                       <TabsContent value="agenda" className="h-[400px] m-0">
@@ -155,8 +147,7 @@ const Dashboard = () => {
           </div>
           
           {/* Tactical footer - Only visible in map view */}
-          {activeTab === "mapa" && (
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 pointer-events-auto">
+          {activeTab === "mapa" && <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 pointer-events-auto">
               <div className="tactical-panel p-4 flex items-center">
                 <Radar />
                 <div className="ml-4">
@@ -183,12 +174,9 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;

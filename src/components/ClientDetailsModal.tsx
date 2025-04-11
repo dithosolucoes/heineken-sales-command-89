@@ -108,6 +108,11 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
     }
   };
 
+  // Função para retornar a classe de cor adequada com base no valor booleano
+  const getStatusColor = (value: boolean) => {
+    return value ? "text-heineken-neon" : "text-[#ea384c]";
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-tactical-black border-heineken/30 p-0 max-w-md">
@@ -146,7 +151,9 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                 <DollarSign className="h-5 w-5 text-heineken mr-2" />
                 <span className="text-sm text-tactical-silver">OPP:</span>
               </div>
-              <span className="text-sm text-heineken-neon">{client.opp ? "SIM" : "NÃO"}</span>
+              <span className={`text-sm ${getStatusColor(client.opp)}`}>
+                {client.opp ? "SIM" : "NÃO"}
+              </span>
             </div>
             
             {/* Refrigerador */}
@@ -155,7 +162,9 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                 <Refrigerator className="h-5 w-5 text-heineken mr-2" />
                 <span className="text-sm text-tactical-silver">REFRIGERADOR:</span>
               </div>
-              <span className="text-sm text-heineken-neon">{client.refrigerator ? "SIM" : "NÃO"}</span>
+              <span className={`text-sm ${getStatusColor(client.refrigerator)}`}>
+                {client.refrigerator ? "SIM" : "NÃO"}
+              </span>
             </div>
             
             {/* Potencial */}
@@ -175,7 +184,9 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                 <Wine className="h-5 w-5 text-heineken mr-2" />
                 <span className="text-sm text-tactical-silver">VASILHAME:</span>
               </div>
-              <span className="text-sm text-heineken-neon">{client.bottle ? "SIM" : "NÃO"}</span>
+              <span className={`text-sm ${getStatusColor(client.bottle)}`}>
+                {client.bottle ? "SIM" : "NÃO"}
+              </span>
             </div>
             
             {/* Cluster */}

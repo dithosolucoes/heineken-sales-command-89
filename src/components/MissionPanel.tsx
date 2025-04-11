@@ -15,9 +15,10 @@ interface Mission {
 
 interface MissionPanelProps {
   missions: Mission[];
+  compact?: boolean;
 }
 
-const MissionPanel: React.FC<MissionPanelProps> = ({ missions }) => {
+const MissionPanel: React.FC<MissionPanelProps> = ({ missions, compact = false }) => {
   // Sort missions by priority (high first)
   const sortedMissions = [...missions].sort((a, b) => {
     const priorityValues = { high: 3, medium: 2, low: 1 };
@@ -38,10 +39,10 @@ const MissionPanel: React.FC<MissionPanelProps> = ({ missions }) => {
   };
 
   return (
-    <div className="tactical-panel h-full flex flex-col p-4">
-      <div className="flex items-center justify-between border-b border-heineken/20 pb-2 mb-4">
-        <h2 className="text-sm font-bold text-heineken-neon flex items-center">
-          <Target size={16} className="mr-2" />
+    <div className={`tactical-panel h-full flex flex-col ${compact ? 'p-2' : 'p-4'}`}>
+      <div className="flex items-center justify-between border-b border-heineken/20 pb-2 mb-3">
+        <h2 className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-heineken-neon flex items-center`}>
+          <Target size={compact ? 14 : 16} className="mr-2" />
           MISSÕES ATIVAS
         </h2>
         <span className="text-xs text-tactical-silver">{missions.length} missões</span>
@@ -53,27 +54,29 @@ const MissionPanel: React.FC<MissionPanelProps> = ({ missions }) => {
           <p>Nenhuma missão ativa</p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+        <div className="flex-1 overflow-y-auto pr-1 space-y-3">
           {sortedMissions.map((mission) => (
             <div 
               key={mission.id} 
-              className="tactical-panel p-3 border border-l-4 hover:bg-tactical-darkgray/90 transition-all duration-200"
+              className={`tactical-panel ${compact ? 'p-2' : 'p-3'} border border-l-4 hover:bg-tactical-darkgray/90 transition-all duration-200`}
               style={{ borderLeftColor: mission.priority === "high" ? "#ef4444" : 
                        mission.priority === "medium" ? "#eab308" : "#3b82f6" }}
             >
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="text-sm font-bold text-tactical-silver">
+              <div className="flex items-start justify-between mb-1">
+                <h3 className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-tactical-silver`}>
                   {mission.title}
                 </h3>
-                <span className={`text-xs ${getPriorityClass(mission.priority)} px-1.5 py-0.5 rounded-sm border border-current`}>
-                  {mission.priority === "high" ? "CRÍTICO" : 
-                   mission.priority === "medium" ? "RELEVANTE" : "PADRÃO"}
-                </span>
+                {!compact && (
+                  <span className={`text-xs ${getPriorityClass(mission.priority)} px-1.5 py-0.5 rounded-sm border border-current`}>
+                    {mission.priority === "high" ? "CRÍTICO" : 
+                    mission.priority === "medium" ? "RELEVANTE" : "PADRÃO"}
+                  </span>
+                )}
               </div>
               
-              <p className="text-xs text-tactical-silver/80 mb-3">{mission.description}</p>
+              {!compact && <p className="text-xs text-tactical-silver/80 mb-2">{mission.description}</p>}
               
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1">
                 <ProgressBar 
                   value={mission.progress} 
                   max={mission.total} 
@@ -95,12 +98,14 @@ const MissionPanel: React.FC<MissionPanelProps> = ({ missions }) => {
         </div>
       )}
 
-      <div className="border-t border-heineken/20 pt-3 mt-3">
-        <button className="w-full tactical-button py-1.5 text-xs flex items-center justify-center">
-          <Check size={12} className="mr-1" />
-          COMPLETAR MISSÕES
-        </button>
-      </div>
+      {!compact && (
+        <div className="border-t border-heineken/20 pt-3 mt-3">
+          <button className="w-full tactical-button py-1.5 text-xs flex items-center justify-center">
+            <Check size={12} className="mr-1" />
+            COMPLETAR MISSÕES
+          </button>
+        </div>
+      )}
     </div>
   );
 };

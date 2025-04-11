@@ -45,8 +45,10 @@ const Dashboard = () => {
   
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-tactical-black">
-      {/* Mapa como background - sempre visível */}
-      <Map className={`z-0 ${activeTab === "mapa" ? "pointer-events-auto" : "pointer-events-none"}`} />
+      {/* Mapa como background - sempre visível com interatividade condicionada pela tab ativa */}
+      <div className="absolute inset-0">
+        <Map className={`${activeTab === "mapa" ? "pointer-events-auto" : "pointer-events-none"}`} />
+      </div>
       
       {/* Conteúdo principal sobreposto */}
       <div className="flex flex-col min-h-screen z-10 relative">
@@ -121,9 +123,9 @@ const Dashboard = () => {
                   
                     {/* TabsContent */}
                     <div className="flex-1 mt-4">
-                      {/* Não precisamos de um contêiner vazio para o mapa */}
-                      <TabsContent value="mapa" className="h-[400px] m-0">
-                        {/* Deixamos esse espaço vazio para interagir com o mapa de fundo */}
+                      {/* Tab Mapa - Mantém espaço para interatividade do mapa de fundo */}
+                      <TabsContent value="mapa" className="h-[400px] m-0 pointer-events-none">
+                        {/* Mantém espaço vazio mas transparente para interação com o mapa */}
                       </TabsContent>
                       <TabsContent value="agenda" className="h-[400px] m-0">
                         <div className="tactical-panel h-full flex flex-col items-center justify-center p-4">

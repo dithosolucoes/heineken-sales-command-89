@@ -1,13 +1,12 @@
-
 import { useState } from "react";
-import { Client } from "@/types/client";
+import { ClientData } from "@/types/client";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Users, MapPin, Search, Phone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface MobileClientsListProps {
-  clients: Client[];
-  onSelectClient: (client: Client) => void;
+  clients: ClientData[];
+  onSelectClient: (client: ClientData) => void;
   onOpenModal: () => void;
 }
 
@@ -22,10 +21,11 @@ const MobileClientsList = ({
   const filteredClients = clients.filter(
     (client) =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.address.toLowerCase().includes(searchTerm.toLowerCase())
+      client.address.street.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.address.neighborhood.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSelectClient = (client: Client) => {
+  const handleSelectClient = (client: ClientData) => {
     onSelectClient(client);
     onOpenModal();
     setIsOpen(false);
@@ -70,11 +70,11 @@ const MobileClientsList = ({
                     </div>
                     <div className="mt-1 text-xs text-tactical-silver flex items-start">
                       <MapPin className="h-3 w-3 mr-1 mt-0.5 flex-shrink-0" />
-                      <span>{client.address}</span>
+                      <span>{client.address.street}, {client.address.neighborhood}</span>
                     </div>
                     <div className="mt-1 text-xs text-tactical-silver flex items-center">
                       <Phone className="h-3 w-3 mr-1" />
-                      <span>{client.phone}</span>
+                      <span>N/A</span>
                     </div>
                   </div>
                 ))}

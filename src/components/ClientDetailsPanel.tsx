@@ -4,22 +4,10 @@ import { X, Store, MapPin, Phone, Package, Star, CheckCircle } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ProgressBar from "./ProgressBar";
-
-interface Client {
-  id: string;
-  name: string;
-  type: "bar" | "mercado" | "padaria" | "restaurante";
-  cluster: number;
-  address: string;
-  phone: string;
-  products: string[];
-  observations: string[];
-  tier: "bronze" | "prata" | "ouro" | "diamante";
-  lastVisit?: string;
-}
+import { ClientData } from "@/types/client";
 
 interface ClientDetailsPanelProps {
-  client: Client | null;
+  client: ClientData | null;
   onClose: () => void;
   onConfirmVisit: (clientId: string) => void;
 }
@@ -42,8 +30,8 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
     });
   };
 
-  const getTierColor = (tier: string) => {
-    switch(tier) {
+  const getTierColor = (potential: string) => {
+    switch(potential) {
       case "diamante":
         return "text-blue-400";
       case "ouro":
@@ -79,10 +67,10 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
         <div>
           <div className="flex items-center">
             <h2 className="text-lg font-bold text-heineken-neon">{client.name}</h2>
-            <div className={`ml-2 ${getTierColor(client.tier)}`}>
-              {Array.from({ length: client.tier === "diamante" ? 4 : 
-                                     client.tier === "ouro" ? 3 : 
-                                     client.tier === "prata" ? 2 : 1 }).map((_, i) => (
+            <div className={`ml-2 ${getTierColor(client.potential)}`}>
+              {Array.from({ length: client.potential === "diamante" ? 4 : 
+                                     client.potential === "ouro" ? 3 : 
+                                     client.potential === "prata" ? 2 : 1 }).map((_, i) => (
                 <Star key={i} size={12} className="inline-block" fill="currentColor" />
               ))}
             </div>
@@ -105,11 +93,13 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
         <div className="space-y-2">
           <div className="flex items-start">
             <MapPin size={16} className="text-tactical-silver mr-2 mt-0.5" />
-            <span className="text-sm text-tactical-silver">{client.address}</span>
+            <span className="text-sm text-tactical-silver">
+              {client.address.street}, {client.address.neighborhood}, {client.address.city}
+            </span>
           </div>
           <div className="flex items-center">
             <Phone size={16} className="text-tactical-silver mr-2" />
-            <span className="text-sm text-tactical-silver">{client.phone}</span>
+            <span className="text-sm text-tactical-silver">N/A</span>
           </div>
         </div>
         
@@ -120,14 +110,12 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
         <div>
           <h3 className="text-xs font-bold text-tactical-silver uppercase mb-2">Produtos de interesse</h3>
           <div className="flex flex-wrap gap-2">
-            {client.products.map((product, i) => (
-              <span 
-                key={i} 
-                className="text-xs bg-tactical-darkgray/50 border border-heineken/20 px-2 py-0.5 rounded-sm text-heineken"
-              >
-                {product}
-              </span>
-            ))}
+            <span className="text-xs bg-tactical-darkgray/50 border border-heineken/20 px-2 py-0.5 rounded-sm text-heineken">
+              Heineken Long Neck
+            </span>
+            <span className="text-xs bg-tactical-darkgray/50 border border-heineken/20 px-2 py-0.5 rounded-sm text-heineken">
+              Heineken Lata
+            </span>
           </div>
         </div>
         
@@ -135,22 +123,16 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
         <div>
           <h3 className="text-xs font-bold text-tactical-silver uppercase mb-2">Observações estratégicas</h3>
           <ul className="text-sm text-tactical-silver space-y-1">
-            {client.observations.map((obs, i) => (
-              <li key={i} className="flex items-start">
-                <span className="text-heineken mr-2">•</span>
-                <span>{obs}</span>
-              </li>
-            ))}
+            <li className="flex items-start">
+              <span className="text-heineken mr-2">•</span>
+              <span>Cliente com potencial para refrigerador exclusivo</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-heineken mr-2">•</span>
+              <span>Preferência por produtos premium</span>
+            </li>
           </ul>
         </div>
-        
-        {/* Last Visit Info */}
-        {client.lastVisit && (
-          <div className="text-xs text-tactical-silver">
-            <span className="block text-heineken-neon">Última visita:</span>
-            <span>{client.lastVisit}</span>
-          </div>
-        )}
         
         {/* Relationship Progress */}
         <div>

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import MobileClientsList from "@/components/MobileClientsList";
+import { clientsData } from "@/utils/clientData";
 
 // Dummy data for missions
 const missions = [{
@@ -42,6 +43,7 @@ const missions = [{
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("mapa");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
   const isMobile = useIsMobile();
   
   return (
@@ -55,7 +57,7 @@ const Dashboard = () => {
       <div className={`flex flex-col min-h-screen relative ${activeTab === "mapa" ? "pointer-events-none" : "pointer-events-auto"}`}>
         {/* Header always needs pointer events */}
         <div className="pointer-events-auto">
-          <Header />
+          <Header userType="vendedor" />
         </div>
 
         <div className="flex-1 flex flex-col container mx-auto px-2 md:px-4 py-4 md:py-6 max-w-7xl">
@@ -113,7 +115,11 @@ const Dashboard = () => {
                         </TabsContent>
                         
                         <TabsContent value="clients" className="mt-0">
-                          <MobileClientsList />
+                          <MobileClientsList 
+                            clients={clientsData}
+                            onSelectClient={setSelectedClient}
+                            onOpenModal={() => {}}
+                          />
                         </TabsContent>
                       </Tabs>
                     </div>

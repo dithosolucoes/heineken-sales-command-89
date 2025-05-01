@@ -39,7 +39,7 @@ const missions = [{
 }];
 
 const Dashboard = () => {
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
   const [clients] = useState<ClientData[]>(clientsData);
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

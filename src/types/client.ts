@@ -35,6 +35,7 @@ export interface ClientData {
   opp: boolean;
   refrigerator: boolean;
   bottle: boolean;
+  converted: boolean; // Added conversion status field
   address: {
     street: string;
     neighborhood: string;

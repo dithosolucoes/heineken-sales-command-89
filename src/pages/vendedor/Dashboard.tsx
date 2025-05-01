@@ -53,6 +53,11 @@ const Dashboard = () => {
     document.title = "Dashboard | Heineken SP SUL";
   }, []);
 
+  const handleConfirmConversion = (clientId: string) => {
+    console.log(`Conversion confirmed for client ${clientId}`);
+    // Here you would typically update the client data in a real app
+  };
+
   return (
     <DashboardLayout userType="vendedor" pageTitle="">
       {/* Mapa como elemento principal de fundo */}
@@ -100,7 +105,7 @@ const Dashboard = () => {
               <ClientDetailsPanel 
                 client={selectedClient} 
                 onClose={() => setSelectedClient(null)}
-                onConfirmVisit={() => {}}
+                onConfirmConversion={handleConfirmConversion}
               />
             </div>
           )}

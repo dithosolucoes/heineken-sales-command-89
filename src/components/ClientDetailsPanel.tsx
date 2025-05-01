@@ -1,6 +1,6 @@
 
 import React from "react";
-import { X, Store, MapPin, Phone, Package, Star, CheckCircle } from "lucide-react";
+import { X, Store, MapPin, Phone, Package, Star, CheckCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ProgressBar from "./ProgressBar";
@@ -9,23 +9,23 @@ import { ClientData } from "@/types/client";
 interface ClientDetailsPanelProps {
   client: ClientData | null;
   onClose: () => void;
-  onConfirmVisit: (clientId: string) => void;
+  onConfirmConversion: (clientId: string) => void;
 }
 
 const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
   client,
   onClose,
-  onConfirmVisit,
+  onConfirmConversion,
 }) => {
   const { toast } = useToast();
 
   if (!client) return null;
 
-  const handleConfirmVisit = () => {
-    onConfirmVisit(client.id);
+  const handleConfirmConversion = () => {
+    onConfirmConversion(client.id);
     toast({
-      title: "Missão cumprida!",
-      description: `Visita ao cliente ${client.name} confirmada com sucesso.`,
+      title: "Conversão registrada",
+      description: "Será validada com base na planilha de vendas enviada às 17h.",
       duration: 3000,
     });
   };
@@ -78,8 +78,6 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
           <div className="flex items-center text-xs text-tactical-silver mt-1">
             {getTypeIcon(client.type)}
             <span className="ml-1 capitalize">{client.type}</span>
-            <span className="mx-2">•</span>
-            <span>Cluster {client.cluster}</span>
           </div>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose} className="text-tactical-silver hover:text-white">
@@ -100,6 +98,17 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
           <div className="flex items-center">
             <Phone size={16} className="text-tactical-silver mr-2" />
             <span className="text-sm text-tactical-silver">N/A</span>
+          </div>
+        </div>
+
+        {/* Conversion Status */}
+        <div className="flex items-center justify-between p-3 bg-tactical-darkgray/50 rounded-sm">
+          <span className="text-sm text-tactical-silver">Status de conversão:</span>
+          <div className={`flex items-center text-sm ${client.converted ? 'text-heineken-neon' : 'text-[#ea384c]'}`}>
+            {client.converted ? 
+              <><Check size={14} className="mr-1" /> Convertido</> : 
+              <>Não convertido</>
+            }
           </div>
         </div>
         
@@ -144,11 +153,11 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
       {/* Footer/Action */}
       <div className="p-4 border-t border-heineken/20">
         <Button 
-          onClick={handleConfirmVisit} 
+          onClick={handleConfirmConversion} 
           className="w-full tactical-button py-6"
         >
           <CheckCircle size={16} className="mr-2" />
-          CONFIRMAR VISITA
+          CONFIRMAR CONVERSÃO
         </Button>
       </div>
     </div>

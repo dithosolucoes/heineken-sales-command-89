@@ -8,15 +8,14 @@ import {
 } from "@/components/ui/dialog";
 import { 
   Store, 
-  DollarSign, 
-  Refrigerator, 
   Shield, 
   Wine, 
   Compass,
   MapPin,
   Building2,
   MapPinned,
-  Mail
+  Mail,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +25,7 @@ interface ClientDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   client: ClientDetails | null;
-  onConfirmVisit?: (clientId: string) => void;
+  onConfirmConversion?: (clientId: string) => void;
 }
 
 interface ClientDetails {
@@ -39,6 +38,7 @@ interface ClientDetails {
   refrigerator: boolean;
   potential: "bronze" | "prata" | "ouro" | "diamante";
   bottle: boolean;
+  converted: boolean; // Added conversion status
   address: {
     street: string;
     neighborhood: string;
@@ -91,26 +91,21 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
   isOpen,
   onClose,
   client,
-  onConfirmVisit
+  onConfirmConversion
 }) => {
   const { toast } = useToast();
 
   if (!client) return null;
 
-  const handleConfirmVisit = () => {
-    if (onConfirmVisit && client) {
-      onConfirmVisit(client.id);
+  const handleConfirmConversion = () => {
+    if (onConfirmConversion && client) {
+      onConfirmConversion(client.id);
       toast({
-        title: "Missão cumprida!",
-        description: `Visita ao cliente ${client.name} confirmada com sucesso.`,
+        title: "Conversão registrada",
+        description: "Será validada com base na planilha de vendas enviada às 17h.",
         duration: 3000,
       });
     }
-  };
-
-  // Função para retornar a classe de cor adequada com base no valor booleano
-  const getStatusColor = (value: boolean) => {
-    return value ? "text-heineken-neon" : "text-[#ea384c]";
   };
 
   return (
@@ -127,8 +122,6 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                 <div className="flex items-center text-xs text-tactical-silver mt-1">
                   {getCategoryIcon(client.category)}
                   <span className="ml-1">{client.category}</span>
-                  <span className="mx-2">•</span>
-                  <span>Cluster {client.cluster}</span>
                 </div>
               </div>
             </div>
@@ -145,25 +138,19 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
               <span className="text-sm text-heineken-neon">{client.category}</span>
             </div>
             
-            {/* OPP (Investimento) */}
+            {/* Conversion Status */}
             <div className="flex items-center justify-between p-3 bg-tactical-darkgray/50 rounded-sm">
               <div className="flex items-center">
-                <DollarSign className="h-5 w-5 text-heineken mr-2" />
-                <span className="text-sm text-tactical-silver">OPP:</span>
+                <Shield className="h-5 w-5 text-heineken mr-2" />
+                <span className="text-sm text-tactical-silver">STATUS DE CONVERSÃO:</span>
               </div>
-              <span className={`text-sm ${getStatusColor(client.opp)}`}>
-                {client.opp ? "SIM" : "NÃO"}
-              </span>
-            </div>
-            
-            {/* Refrigerador */}
-            <div className="flex items-center justify-between p-3 bg-tactical-darkgray/50 rounded-sm">
-              <div className="flex items-center">
-                <Refrigerator className="h-5 w-5 text-heineken mr-2" />
-                <span className="text-sm text-tactical-silver">REFRIGERADOR:</span>
-              </div>
-              <span className={`text-sm ${getStatusColor(client.refrigerator)}`}>
-                {client.refrigerator ? "SIM" : "NÃO"}
+              <span className={`text-sm ${client.converted ? 'text-heineken-neon' : 'text-[#ea384c]'}`}>
+                {client.converted ? (
+                  <div className="flex items-center">
+                    <Check className="h-4 w-4 mr-1" />
+                    <span>CONVERTIDO</span>
+                  </div>
+                ) : "NÃO CONVERTIDO"}
               </span>
             </div>
             
@@ -184,18 +171,9 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                 <Wine className="h-5 w-5 text-heineken mr-2" />
                 <span className="text-sm text-tactical-silver">VASILHAME:</span>
               </div>
-              <span className={`text-sm ${getStatusColor(client.bottle)}`}>
+              <span className={`text-sm ${client.bottle ? 'text-heineken-neon' : 'text-[#ea384c]'}`}>
                 {client.bottle ? "SIM" : "NÃO"}
               </span>
-            </div>
-            
-            {/* Cluster */}
-            <div className="flex items-center justify-between p-3 bg-tactical-darkgray/50 rounded-sm">
-              <div className="flex items-center">
-                <Compass className="h-5 w-5 text-heineken mr-2" />
-                <span className="text-sm text-tactical-silver">CLUSTER:</span>
-              </div>
-              <span className="text-sm text-heineken-neon">CLUSTER {client.cluster}</span>
             </div>
             
             {/* Endereço Completo */}
@@ -229,10 +207,10 @@ const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
           {/* Footer/Action */}
           <div className="p-4 border-t border-heineken/20">
             <Button 
-              onClick={handleConfirmVisit} 
+              onClick={handleConfirmConversion} 
               className="w-full tactical-button py-6"
             >
-              CONFIRMAR VISITA
+              CONFIRMAR CONVERSÃO
             </Button>
           </div>
         </div>

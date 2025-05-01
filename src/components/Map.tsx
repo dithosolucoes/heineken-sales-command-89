@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { MapPin, Store, Search, Gamepad, Utensils, Coffee, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -210,11 +209,11 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
     };
   }, []);
   
-  // Função para criar ícone personalizado para o cliente
+  // Function to create a custom icon for the client
   const createClientIcon = (client: ClientData) => {
     const potentialClass = getPotentialColor(client.potential);
     
-    // HTML para o ícone personalizado baseado na categoria
+    // HTML for the custom icon based on the category
     const iconHtml = `
       <div class="marker-icon ${client.type}">
         <div class="marker-pin ${potentialClass}"></div>
@@ -234,8 +233,8 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
     setIsModalOpen(true);
   };
 
-  const handleConfirmVisit = (clientId: string) => {
-    console.log(`Visit confirmed for client ${clientId}`);
+  const handleConfirmConversion = (clientId: string) => {
+    console.log(`Conversion confirmed for client ${clientId}`);
     setIsModalOpen(false);
   };
 
@@ -298,7 +297,7 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         client={selectedClient}
-        onConfirmVisit={handleConfirmVisit}
+        onConfirmConversion={handleConfirmConversion}
       />
     </div>
   );

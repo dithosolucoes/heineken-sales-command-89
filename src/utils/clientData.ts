@@ -14,6 +14,7 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: true,
     bottle: false,
+    converted: true, // Added conversion status
     address: {
       street: "Av. Paulista, 1000",
       neighborhood: "Bela Vista",
@@ -32,6 +33,7 @@ export const clientsData: ClientData[] = [
     opp: true,
     refrigerator: false,
     bottle: true,
+    converted: false, // Added conversion status
     address: {
       street: "Rua Augusta, 500",
       neighborhood: "Consolação",
@@ -50,6 +52,7 @@ export const clientsData: ClientData[] = [
     opp: true,
     refrigerator: true,
     bottle: true,
+    converted: true, // Added conversion status
     address: {
       street: "Av. Rebouças, 2000",
       neighborhood: "Pinheiros",
@@ -68,6 +71,7 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: true,
     bottle: false,
+    converted: true, // Added conversion status
     address: {
       street: "Rua Oscar Freire, 300",
       neighborhood: "Jardim Paulista",
@@ -86,6 +90,7 @@ export const clientsData: ClientData[] = [
     opp: true,
     refrigerator: false,
     bottle: false,
+    converted: false, // Added conversion status
     address: {
       street: "Av. Brigadeiro Faria Lima, 1500",
       neighborhood: "Jardim Paulistano",
@@ -104,6 +109,7 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: true,
     bottle: true,
+    converted: false, // Added conversion status
     address: {
       street: "Av. Paulista, 2000",
       neighborhood: "Bela Vista",
@@ -122,6 +128,7 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: false,
     bottle: false,
+    converted: false, // Added conversion status
     address: {
       street: "R. Cel. Fernando Prestes, 100",
       neighborhood: "Centro",

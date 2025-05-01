@@ -10,6 +10,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ClientData } from "@/types/client";
 import { clientsData } from "@/utils/clientData";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
+import { Search, Filter, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 // Dados fictícios para as missões
 const missions = [{
@@ -43,39 +45,94 @@ const Dashboard = () => {
   const [clients] = useState<ClientData[]>(clientsData);
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isPanelMinimized, setIsPanelMinimized] = useState(false);
+  const [isMissionMinimized, setIsMissionMinimized] = useState(false);
 
   useEffect(() => {
     document.title = "Dashboard | Heineken SP SUL";
   }, []);
 
   return (
-    <DashboardLayout userType="vendedor" pageTitle="Dashboard">
-      <div className="flex flex-col md:flex-row flex-1 gap-4">
-        <div className="w-full md:w-2/3 xl:w-3/4 space-y-4">
-          <div className="h-[70vh] tactical-panel relative">
-            <Map />
-            <div className="absolute bottom-4 right-4">
-              <Radar />
-            </div>
-          </div>
-        </div>
+    <DashboardLayout userType="vendedor" pageTitle="">
+      {/* Mapa como elemento principal de fundo */}
+      <div className="absolute inset-0 -mt-12">
+        <Map />
+      </div>
 
-        <div className="w-full md:w-1/3 xl:w-1/4 space-y-4">
-          {selectedClient ? (
-            <ClientDetailsPanel 
-              client={selectedClient} 
-              onClose={() => setSelectedClient(null)}
-              onConfirmVisit={() => {}}
-            />
-          ) : (
-            <div className="tactical-panel h-full flex flex-col items-center justify-center p-4">
-              <p className="text-tactical-silver text-sm">Selecione um cliente para ver detalhes</p>
-            </div>
-          )}
-          <MissionPanel missions={missions} />
+      {/* Barra de pesquisa centralizada */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md">
+        <div className="relative">
+          <Input
+            placeholder="Buscar cliente por nome ou endereço..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-tactical-black/70 border-heineken/30 pl-9 pr-4 py-2 text-sm text-white w-full shadow-lg"
+          />
+          <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-tactical-silver" />
         </div>
       </div>
 
+      {/* Radar posicionado no canto inferior direito */}
+      <div className="absolute bottom-8 right-8 z-10">
+        <Radar />
+      </div>
+
+      {/* Painel de Cliente (flutuante no canto superior direito) */}
+      {selectedClient && (
+        <div className={`absolute ${isPanelMinimized ? 'top-4 right-4 w-auto h-auto' : 'top-14 right-4 w-full max-w-sm'} transition-all duration-300 ease-in-out z-20`}>
+          {isPanelMinimized ? (
+            <button 
+              onClick={() => setIsPanelMinimized(false)}
+              className="tactical-button p-2 rounded-md flex items-center"
+            >
+              <span className="text-xs mr-2">Cliente: {selectedClient.name}</span>
+              <span className="text-tactical-silver">+</span>
+            </button>
+          ) : (
+            <div className="relative">
+              <button 
+                onClick={() => setIsPanelMinimized(true)}
+                className="absolute -top-8 right-0 bg-tactical-darkgray/80 border border-heineken/20 text-tactical-silver p-1 rounded-t-md"
+              >
+                <X size={16} />
+              </button>
+              <ClientDetailsPanel 
+                client={selectedClient} 
+                onClose={() => setSelectedClient(null)}
+                onConfirmVisit={() => {}}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Painel de Missões (flutuante no canto inferior esquerdo) */}
+      <div className={`absolute ${isMissionMinimized ? 'bottom-4 left-4 w-auto h-auto' : 'bottom-4 left-4 w-full max-w-xs'} transition-all duration-300 ease-in-out z-10`}>
+        {isMissionMinimized ? (
+          <button 
+            onClick={() => setIsMissionMinimized(false)}
+            className="tactical-button p-2 rounded-md"
+          >
+            <span className="text-xs">Missões ({missions.length})</span>
+          </button>
+        ) : (
+          <div className="relative animate-tactical-fade">
+            <button 
+              onClick={() => setIsMissionMinimized(true)}
+              className="absolute -top-8 right-0 bg-tactical-darkgray/80 border border-heineken/20 text-tactical-silver p-1 rounded-t-md"
+            >
+              <X size={16} />
+            </button>
+            <MissionPanel 
+              missions={missions} 
+              compact={isMobile} 
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Lista mobile de clientes */}
       {isMobile && (
         <MobileClientsList 
           clients={clients}

@@ -61,9 +61,9 @@ const ClientDetailsPanel: React.FC<ClientDetailsPanelProps> = ({
   };
 
   return (
-    <div className="tactical-panel border-tactical w-full max-w-md animate-tactical-fade">
+    <div className="tactical-panel border-tactical w-full max-w-md animate-tactical-fade bg-tactical-darkgray/90 backdrop-blur-md">
       {/* Header */}
-      <div className="bg-tactical-darkgray border-b border-heineken/20 p-4 flex items-start justify-between">
+      <div className="bg-tactical-darkgray/90 border-b border-heineken/20 p-4 flex items-start justify-between">
         <div>
           <div className="flex items-center">
             <h2 className="text-lg font-bold text-heineken-neon">{client.name}</h2>

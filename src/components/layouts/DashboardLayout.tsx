@@ -12,8 +12,8 @@ const DashboardLayout = ({ children, userType, pageTitle }: DashboardLayoutProps
   return (
     <div className="min-h-screen flex flex-col">
       <Header userType={userType} />
-      <div className="flex-1 p-4">
-        <h1 className="text-2xl font-bold mb-4 text-tactical">{pageTitle}</h1>
+      <div className="flex-1 relative">
+        {pageTitle && <h1 className="text-2xl font-bold mb-4 ml-4 mt-4 text-tactical z-10 relative">{pageTitle}</h1>}
         {children}
       </div>
     </div>

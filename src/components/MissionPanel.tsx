@@ -39,7 +39,7 @@ const MissionPanel: React.FC<MissionPanelProps> = ({ missions, compact = false }
   };
 
   return (
-    <div className={`tactical-panel h-full flex flex-col ${compact ? 'p-2' : 'p-4'}`}>
+    <div className={`tactical-panel h-full flex flex-col ${compact ? 'p-2' : 'p-4'} bg-tactical-darkgray/90 backdrop-blur-md`}>
       <div className="flex items-center justify-between border-b border-heineken/20 pb-2 mb-3">
         <h2 className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-heineken-neon flex items-center`}>
           <Target size={compact ? 14 : 16} className="mr-2" />

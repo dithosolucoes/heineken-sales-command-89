@@ -74,4 +74,28 @@
   .tactical-button {
     @apply bg-tactical-darkgray border border-heineken text-heineken-neon hover:bg-heineken/20 transition-all duration-300 font-bold uppercase tracking-wider;
   }
+  
+  .tactical-overlay {
+    background: linear-gradient(180deg, rgba(18, 18, 18, 0.7) 0%, rgba(0, 0, 0, 0.2) 100%);
+    backdrop-filter: blur(2px);
+  }
+  
+  .tactical-glow {
+    box-shadow: 0 0 15px rgba(62, 255, 127, 0.3);
+  }
+  
+  .tactical-text-glow {
+    text-shadow: 0 0 8px rgba(62, 255, 127, 0.5);
+  }
+  
+  .tactical-border {
+    border: 1px solid rgba(62, 255, 127, 0.3);
+  }
+  
+  .tactical-grid {
+    background-image: 
+      linear-gradient(rgba(62, 255, 127, 0.05) 1px, transparent 1px),
+      linear-gradient(to right, rgba(62, 255, 127, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
 }

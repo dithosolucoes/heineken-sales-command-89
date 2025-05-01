@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { MapPin, Store, Search, Gamepad, Utensils, Coffee, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -155,6 +156,34 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
       .leaflet-control-zoom a:hover {
         background-color: rgba(62, 255, 127, 0.2) !important;
       }
+      
+      /* Add grid overlay */
+      .leaflet-container:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+          linear-gradient(rgba(62, 255, 127, 0.05) 1px, transparent 1px), 
+          linear-gradient(90deg, rgba(62, 255, 127, 0.05) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: 1000;
+      }
+      
+      /* Add subtle vignette effect */
+      .map-vignette {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-shadow: inset 0 0 150px rgba(0,0,0,0.7);
+        pointer-events: none;
+        z-index: 1001;
+      }
     `;
     document.head.appendChild(style);
     
@@ -234,24 +263,14 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
   };
 
   return (
-    <div className={`absolute inset-0 ${className}`}>
+    <div className={`w-full h-full ${className}`}>
       {/* Map */}
-      <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" />
+      <div ref={mapRef} className="w-full h-full z-0" />
       
-      {/* Search bar - Floating on top of map */}
-      <div className="absolute top-4 left-4 right-4 z-10 max-w-lg mx-auto">
-        <div className="relative">
-          <Input
-            placeholder="Buscar cliente por nome ou endereço..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="bg-tactical-black/80 border-heineken/30 pl-9 pr-4 py-2 text-sm text-white w-full"
-          />
-          <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-tactical-silver" />
-        </div>
-      </div>
+      {/* Vignette/border effect */}
+      <div className="map-vignette" />
       
-      {/* Legend */}
+      {/* Legend - moved to bottom left corner */}
       <div className="absolute bottom-4 left-4 bg-tactical-black/80 border border-heineken/20 p-2 rounded-sm z-10">
         <p className="text-xs text-tactical-silver mb-1">Cliente por tier:</p>
         <div className="flex items-center space-x-3">

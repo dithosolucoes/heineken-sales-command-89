@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Map from "@/components/Map";
 import Radar from "@/components/Radar";
-import ClientDetailsPanel from "@/components/ClientDetailsPanel";
 import ClientPanel from "@/components/ClientPanel";
 import MobileClientsList from "@/components/MobileClientsList";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -85,9 +84,10 @@ const Dashboard = () => {
               >
                 <X size={16} />
               </button>
-              <ClientDetailsPanel 
-                client={selectedClient} 
-                onClose={() => setSelectedClient(null)}
+              <ClientDetailsModal 
+                isOpen={true} 
+                onClose={() => setSelectedClient(null)} 
+                client={selectedClient}
                 onConfirmConversion={handleConfirmConversion}
               />
             </div>

@@ -1,19 +1,27 @@
 
 import React, { useState } from "react";
-import { Calendar, CalendarDays, CalendarRange, Store, MapPin } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Calendar, Store, MapPin } from "lucide-react";
 import { ClientData } from "@/types/client";
 import { getPotentialColor } from "@/utils/clientData";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 interface ClientPanelProps {
   clients: ClientData[];
   onSelectClient?: (client: ClientData) => void;
+  onHoverClient?: (client: ClientData | null) => void;
   compact?: boolean;
 }
 
 const ClientPanel: React.FC<ClientPanelProps> = ({ 
   clients, 
   onSelectClient, 
+  onHoverClient,
   compact = false 
 }) => {
   const [dateFilter, setDateFilter] = useState<'day' | 'week' | 'month'>('day');
@@ -86,17 +94,19 @@ const ClientPanel: React.FC<ClientPanelProps> = ({
           <Store size={compact ? 14 : 16} className="mr-2" />
           PRÓXIMOS ATENDIMENTOS
         </h2>
-        <ToggleGroup type="single" value={dateFilter} onValueChange={(value) => setDateFilter(value as 'day' | 'week' | 'month')}>
-          <ToggleGroupItem value="day" aria-label="Dia" className="p-1">
-            <Calendar size={compact ? 12 : 14} />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="week" aria-label="Semana" className="p-1">
-            <CalendarDays size={compact ? 12 : 14} />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="month" aria-label="Mês" className="p-1">
-            <CalendarRange size={compact ? 12 : 14} />
-          </ToggleGroupItem>
-        </ToggleGroup>
+        <Select 
+          value={dateFilter} 
+          onValueChange={(value) => setDateFilter(value as 'day' | 'week' | 'month')}
+        >
+          <SelectTrigger className="w-[100px] h-7 bg-tactical-black/50 border-heineken/20 text-xs">
+            <SelectValue placeholder="Período" />
+          </SelectTrigger>
+          <SelectContent className="bg-tactical-darkgray border-heineken/20 text-tactical-silver">
+            <SelectItem value="day" className="text-xs">Hoje</SelectItem>
+            <SelectItem value="week" className="text-xs">Semana</SelectItem>
+            <SelectItem value="month" className="text-xs">Mês</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {filteredClients.length === 0 ? (
@@ -105,11 +115,11 @@ const ClientPanel: React.FC<ClientPanelProps> = ({
           <p>Nenhum cliente para atendimento neste período</p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto pr-1 space-y-3">
+        <div className="flex-1 overflow-y-auto pr-1 space-y-3 max-h-[calc(100%-2rem)]">
           {filteredClients.map((client) => (
             <div 
               key={client.id} 
-              className={`tactical-panel ${compact ? 'p-2' : 'p-3'} border border-l-4 hover:bg-tactical-darkgray/90 transition-all duration-200 cursor-pointer`}
+              className={`tactical-panel ${compact ? 'p-2' : 'p-3'} border border-l-4 hover:bg-tactical-darkgray/90 hover:border-heineken transition-all duration-200 cursor-pointer`}
               style={{ borderLeftColor: 
                 client.potential === "diamante" ? "#60A5FA" : 
                 client.potential === "ouro" ? "#FFD700" : 
@@ -118,6 +128,8 @@ const ClientPanel: React.FC<ClientPanelProps> = ({
                 "#CD7F32" 
               }}
               onClick={() => onSelectClient && onSelectClient(client)}
+              onMouseEnter={() => onHoverClient && onHoverClient(client)}
+              onMouseLeave={() => onHoverClient && onHoverClient(null)}
             >
               <div className="flex items-start justify-between mb-1">
                 <h3 className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-tactical-silver`}>

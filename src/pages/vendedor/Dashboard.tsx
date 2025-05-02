@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Map from "@/components/Map";
 import Radar from "@/components/Radar";
 import ClientDetailsPanel from "@/components/ClientDetailsPanel";
-import ClientPanel from "@/components/ClientPanel"; // Updated import
+import ClientPanel from "@/components/ClientPanel";
 import MobileClientsList from "@/components/MobileClientsList";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ClientData } from "@/types/client";
@@ -12,11 +12,13 @@ import { clientsData } from "@/utils/clientData";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import ClientDetailsModal from "@/components/ClientDetailsModal";
 
 const Dashboard = () => {
   const isMobile = useIsMobile();
   const [clients] = useState<ClientData[]>(clientsData);
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
+  const [hoveredClient, setHoveredClient] = useState<ClientData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
@@ -25,6 +27,11 @@ const Dashboard = () => {
   useEffect(() => {
     document.title = "Dashboard | Heineken SP SUL";
   }, []);
+
+  const handleClientSelect = (client: ClientData) => {
+    setSelectedClient(client);
+    setIsModalOpen(true);
+  };
 
   const handleConfirmConversion = (clientId: string) => {
     console.log(`Conversion confirmed for client ${clientId}`);
@@ -35,7 +42,10 @@ const Dashboard = () => {
     <DashboardLayout userType="vendedor" pageTitle="">
       {/* Map as main background element */}
       <div className="absolute inset-0 -mt-12">
-        <Map />
+        <Map 
+          highlightedClientId={hoveredClient?.id} 
+          onSelectClient={handleClientSelect}
+        />
       </div>
 
       {/* Centered search bar */}
@@ -104,18 +114,27 @@ const Dashboard = () => {
             </button>
             <ClientPanel 
               clients={clients} 
-              onSelectClient={setSelectedClient}
+              onSelectClient={handleClientSelect}
+              onHoverClient={setHoveredClient}
               compact={isMobile} 
             />
           </div>
         )}
       </div>
 
+      {/* Client details modal */}
+      <ClientDetailsModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        client={selectedClient}
+        onConfirmConversion={handleConfirmConversion}
+      />
+
       {/* Mobile client list */}
       {isMobile && (
         <MobileClientsList 
           clients={clients}
-          onSelectClient={setSelectedClient}
+          onSelectClient={handleClientSelect}
           onOpenModal={() => setIsModalOpen(true)}
         />
       )}

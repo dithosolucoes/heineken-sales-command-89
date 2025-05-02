@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { MapPin, Store, Search, Gamepad, Utensils, Coffee, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -13,9 +14,15 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 interface MapProps {
   className?: string;
+  highlightedClientId?: string;
+  onSelectClient?: (client: ClientData) => void;
 }
 
-const Map: React.FC<MapProps> = ({ className = "" }) => {
+const Map: React.FC<MapProps> = ({ 
+  className = "", 
+  highlightedClientId, 
+  onSelectClient 
+}) => {
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -114,6 +121,11 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
         transform: scale(1.2);
         z-index: 1000;
       }
+      .marker-icon.highlighted {
+        transform: scale(1.3);
+        box-shadow: 0 0 0 2px rgba(62, 255, 127, 0.8), 0 0 15px rgba(62, 255, 127, 0.6);
+        z-index: 1001;
+      }
       .marker-icon > div {
         width: 100%;
         height: 100%;
@@ -208,6 +220,33 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
       document.head.removeChild(style);
     };
   }, []);
+
+  // Effect for highlighting markers when hovering over client cards
+  useEffect(() => {
+    // Remove highlighted class from all markers first
+    if (!markers.current) return;
+    
+    Object.values(markers.current).forEach(marker => {
+      const el = marker.getElement();
+      if (el) {
+        el.querySelector('.marker-icon')?.classList.remove('highlighted');
+      }
+    });
+
+    // Add highlighted class to the hovered client's marker
+    if (highlightedClientId && markers.current[highlightedClientId]) {
+      const marker = markers.current[highlightedClientId];
+      const el = marker.getElement();
+      if (el) {
+        el.querySelector('.marker-icon')?.classList.add('highlighted');
+      }
+      
+      // Optionally center map on the highlighted marker
+      // if (leafletMap.current) {
+      //   leafletMap.current.panTo(marker.getLatLng(), { animate: true });
+      // }
+    }
+  }, [highlightedClientId]);
   
   // Function to create a custom icon for the client
   const createClientIcon = (client: ClientData) => {
@@ -229,8 +268,12 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
   };
   
   const handleClientClick = (client: ClientData) => {
-    setSelectedClient(client);
-    setIsModalOpen(true);
+    if (onSelectClient) {
+      onSelectClient(client);
+    } else {
+      setSelectedClient(client);
+      setIsModalOpen(true);
+    }
   };
 
   const handleConfirmConversion = (clientId: string) => {
@@ -296,13 +339,15 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
         </div>
       </div>
       
-      {/* Client details modal */}
-      <ClientDetailsModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        client={selectedClient}
-        onConfirmConversion={handleConfirmConversion}
-      />
+      {/* Client details modal - only used if not delegating to parent component */}
+      {!onSelectClient && (
+        <ClientDetailsModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          client={selectedClient}
+          onConfirmConversion={handleConfirmConversion}
+        />
+      )}
     </div>
   );
 };

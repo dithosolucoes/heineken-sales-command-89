@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Map from "@/components/Map";
 import Radar from "@/components/Radar";
 import ClientDetailsPanel from "@/components/ClientDetailsPanel";
-import MissionPanel from "@/components/MissionPanel";
+import ClientPanel from "@/components/MissionPanel";
 import MobileClientsList from "@/components/MobileClientsList";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ClientData } from "@/types/client";
@@ -13,33 +13,6 @@ import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-// Dados fictícios para as missões
-const missions = [{
-  id: "mission1",
-  title: "Conquiste o Cluster 9",
-  description: "Visite e converta 5 clientes no Cluster 9 para aumentar a presença da marca.",
-  progress: 3,
-  total: 5,
-  priority: "high" as const,
-  deadline: "15/04/2025"
-}, {
-  id: "mission2",
-  title: "Expansão de Mix",
-  description: "Introduza Heineken 0.0 em 3 estabelecimentos premium.",
-  progress: 1,
-  total: 3,
-  priority: "medium" as const,
-  deadline: "20/04/2025"
-}, {
-  id: "mission3",
-  title: "Manutenção de PDV",
-  description: "Verifique a qualidade dos displays em 8 PDVs estratégicos.",
-  progress: 4,
-  total: 8,
-  priority: "low" as const,
-  deadline: "30/04/2025"
-}];
-
 const Dashboard = () => {
   const isMobile = useIsMobile();
   const [clients] = useState<ClientData[]>(clientsData);
@@ -47,7 +20,7 @@ const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
-  const [isMissionMinimized, setIsMissionMinimized] = useState(false);
+  const [isClientPanelMinimized, setIsClientPanelMinimized] = useState(false);
 
   useEffect(() => {
     document.title = "Dashboard | Heineken SP SUL";
@@ -112,25 +85,26 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Painel de Missões (flutuante no canto inferior esquerdo) */}
-      <div className={`absolute ${isMissionMinimized ? 'bottom-4 left-4 w-auto h-auto' : 'bottom-4 left-4 w-full max-w-xs'} transition-all duration-300 ease-in-out z-10`}>
-        {isMissionMinimized ? (
+      {/* Painel de Clientes (flutuante no canto inferior esquerdo) */}
+      <div className={`absolute ${isClientPanelMinimized ? 'bottom-4 left-4 w-auto h-auto' : 'bottom-4 left-4 w-full max-w-xs'} transition-all duration-300 ease-in-out z-10`}>
+        {isClientPanelMinimized ? (
           <button 
-            onClick={() => setIsMissionMinimized(false)}
+            onClick={() => setIsClientPanelMinimized(false)}
             className="tactical-button p-2 rounded-md"
           >
-            <span className="text-xs">Missões ({missions.length})</span>
+            <span className="text-xs">Próximos atendimentos</span>
           </button>
         ) : (
           <div className="relative animate-tactical-fade">
             <button 
-              onClick={() => setIsMissionMinimized(true)}
+              onClick={() => setIsClientPanelMinimized(true)}
               className="absolute -top-8 right-0 bg-tactical-darkgray/80 border border-heineken/20 text-tactical-silver p-1 rounded-t-md"
             >
               <X size={16} />
             </button>
-            <MissionPanel 
-              missions={missions} 
+            <ClientPanel 
+              clients={clients} 
+              onSelectClient={setSelectedClient}
               compact={isMobile} 
             />
           </div>

@@ -1,113 +1,155 @@
 
-import React from "react";
-import { Check, Target, AlertTriangle } from "lucide-react";
-import ProgressBar from "./ProgressBar";
+import React, { useState } from "react";
+import { Calendar, CalendarDays, CalendarRange, Store, MapPin } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ClientData } from "@/types/client";
+import { getPotentialColor } from "@/utils/clientData";
 
-interface Mission {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  total: number;
-  priority: "low" | "medium" | "high";
-  deadline?: string;
-}
-
-interface MissionPanelProps {
-  missions: Mission[];
+interface ClientPanelProps {
+  clients: ClientData[];
+  onSelectClient?: (client: ClientData) => void;
   compact?: boolean;
 }
 
-const MissionPanel: React.FC<MissionPanelProps> = ({ missions, compact = false }) => {
-  // Sort missions by priority (high first)
-  const sortedMissions = [...missions].sort((a, b) => {
-    const priorityValues = { high: 3, medium: 2, low: 1 };
-    return priorityValues[b.priority] - priorityValues[a.priority];
-  });
+const ClientPanel: React.FC<ClientPanelProps> = ({ 
+  clients, 
+  onSelectClient, 
+  compact = false 
+}) => {
+  const [dateFilter, setDateFilter] = useState<'day' | 'week' | 'month'>('day');
 
-  const getPriorityClass = (priority: string) => {
-    switch(priority) {
-      case "high":
-        return "text-red-500";
-      case "medium":
-        return "text-yellow-500";
-      case "low":
-        return "text-blue-500";
-      default:
-        return "text-tactical-silver";
-    }
+  // Function to format date to display
+  const formatDate = (date: Date | undefined): string => {
+    if (!date) return 'Não agendado';
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const visitDate = new Date(date);
+    visitDate.setHours(0, 0, 0, 0);
+    
+    const diffDays = Math.floor((visitDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Hoje';
+    if (diffDays === 1) return 'Amanhã';
+    if (diffDays > 1 && diffDays < 7) return `${diffDays} dias`;
+    
+    return visitDate.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit' 
+    });
   };
+
+  const getFilteredClients = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return clients.filter(client => {
+      if (!client.nextVisit) return false;
+      
+      const visitDate = new Date(client.nextVisit);
+      visitDate.setHours(0, 0, 0, 0);
+      
+      switch (dateFilter) {
+        case 'day':
+          // Today only
+          return visitDate.getTime() === today.getTime();
+        
+        case 'week':
+          // Next 7 days
+          const weekLater = new Date(today);
+          weekLater.setDate(weekLater.getDate() + 7);
+          return visitDate >= today && visitDate <= weekLater;
+        
+        case 'month':
+          // Next 30 days
+          const monthLater = new Date(today);
+          monthLater.setDate(monthLater.getDate() + 30);
+          return visitDate >= today && visitDate <= monthLater;
+        
+        default:
+          return true;
+      }
+    }).sort((a, b) => {
+      if (!a.nextVisit) return 1;
+      if (!b.nextVisit) return -1;
+      return a.nextVisit.getTime() - b.nextVisit.getTime();
+    });
+  };
+
+  const filteredClients = getFilteredClients();
 
   return (
     <div className={`tactical-panel h-full flex flex-col ${compact ? 'p-2' : 'p-4'} bg-tactical-darkgray/90 backdrop-blur-md`}>
       <div className="flex items-center justify-between border-b border-heineken/20 pb-2 mb-3">
         <h2 className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-heineken-neon flex items-center`}>
-          <Target size={compact ? 14 : 16} className="mr-2" />
-          MISSÕES ATIVAS
+          <Store size={compact ? 14 : 16} className="mr-2" />
+          PRÓXIMOS ATENDIMENTOS
         </h2>
-        <span className="text-xs text-tactical-silver">{missions.length} missões</span>
+        <ToggleGroup type="single" value={dateFilter} onValueChange={(value) => setDateFilter(value as 'day' | 'week' | 'month')}>
+          <ToggleGroupItem value="day" aria-label="Dia" className="p-1">
+            <Calendar size={compact ? 12 : 14} />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="week" aria-label="Semana" className="p-1">
+            <CalendarDays size={compact ? 12 : 14} />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="month" aria-label="Mês" className="p-1">
+            <CalendarRange size={compact ? 12 : 14} />
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
-      {missions.length === 0 ? (
+      {filteredClients.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-tactical-silver text-sm">
-          <AlertTriangle size={24} className="mb-2" />
-          <p>Nenhuma missão ativa</p>
+          <Store size={24} className="mb-2" />
+          <p>Nenhum cliente para atendimento neste período</p>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto pr-1 space-y-3">
-          {sortedMissions.map((mission) => (
+          {filteredClients.map((client) => (
             <div 
-              key={mission.id} 
-              className={`tactical-panel ${compact ? 'p-2' : 'p-3'} border border-l-4 hover:bg-tactical-darkgray/90 transition-all duration-200`}
-              style={{ borderLeftColor: mission.priority === "high" ? "#ef4444" : 
-                       mission.priority === "medium" ? "#eab308" : "#3b82f6" }}
+              key={client.id} 
+              className={`tactical-panel ${compact ? 'p-2' : 'p-3'} border border-l-4 hover:bg-tactical-darkgray/90 transition-all duration-200 cursor-pointer`}
+              style={{ borderLeftColor: 
+                client.potential === "diamante" ? "#60A5FA" : 
+                client.potential === "ouro" ? "#FFD700" : 
+                client.potential === "prata" ? "#9F9EA1" :
+                client.potential === "inox" ? "#9F9EA1" :  
+                "#CD7F32" 
+              }}
+              onClick={() => onSelectClient && onSelectClient(client)}
             >
               <div className="flex items-start justify-between mb-1">
                 <h3 className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-tactical-silver`}>
-                  {mission.title}
+                  {client.name}
                 </h3>
-                {!compact && (
-                  <span className={`text-xs ${getPriorityClass(mission.priority)} px-1.5 py-0.5 rounded-sm border border-current`}>
-                    {mission.priority === "high" ? "CRÍTICO" : 
-                    mission.priority === "medium" ? "RELEVANTE" : "PADRÃO"}
-                  </span>
-                )}
-              </div>
-              
-              {!compact && <p className="text-xs text-tactical-silver/80 mb-2">{mission.description}</p>}
-              
-              <div className="flex items-center justify-between mb-1">
-                <ProgressBar 
-                  value={mission.progress} 
-                  max={mission.total} 
-                  size="sm"
-                />
-                <span className="text-xs text-heineken ml-2">
-                  {mission.progress}/{mission.total}
+                <span className={`text-xs px-1.5 py-0.5 rounded-sm border border-current ${client.converted ? 'text-green-500' : 'text-yellow-500'}`}>
+                  {client.converted ? 'CONVERTIDO' : 'NÃO CONVERTIDO'}
                 </span>
               </div>
               
-              {mission.deadline && (
-                <div className="text-xs text-tactical-silver/70 flex justify-between">
-                  <span>Prazo:</span>
-                  <span>{mission.deadline}</span>
+              <div className="flex items-center text-xs text-tactical-silver/80 mb-2">
+                <MapPin size={12} className="mr-1" />
+                <span>{client.address.street}, {client.address.neighborhood}</span>
+              </div>
+              
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center">
+                  <div className={`w-2 h-2 rounded-full ${getPotentialColor(client.potential)} mr-1`}></div>
+                  <span className="capitalize">{client.potential}</span>
                 </div>
-              )}
+                
+                <div className="flex items-center">
+                  <Calendar size={12} className="mr-1 text-heineken" />
+                  <span className="text-heineken-neon">{formatDate(client.nextVisit)}</span>
+                </div>
+              </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {!compact && (
-        <div className="border-t border-heineken/20 pt-3 mt-3">
-          <button className="w-full tactical-button py-1.5 text-xs flex items-center justify-center">
-            <Check size={12} className="mr-1" />
-            COMPLETAR MISSÕES
-          </button>
         </div>
       )}
     </div>
   );
 };
 
-export default MissionPanel;
+export default ClientPanel;

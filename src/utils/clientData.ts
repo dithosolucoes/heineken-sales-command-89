@@ -14,13 +14,14 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: true,
     bottle: false,
-    converted: true, // Added conversion status
+    converted: true,
     address: {
       street: "Av. Paulista, 1000",
       neighborhood: "Bela Vista",
       city: "São Paulo",
       zipCode: "01310-100"
-    }
+    },
+    nextVisit: new Date(2025, 4, 3) // Tomorrow
   },
   {
     id: "2",
@@ -33,13 +34,14 @@ export const clientsData: ClientData[] = [
     opp: true,
     refrigerator: false,
     bottle: true,
-    converted: false, // Added conversion status
+    converted: false,
     address: {
       street: "Rua Augusta, 500",
       neighborhood: "Consolação",
       city: "São Paulo",
       zipCode: "01304-000"
-    }
+    },
+    nextVisit: new Date(2025, 4, 4) // In two days
   },
   {
     id: "3",
@@ -52,13 +54,14 @@ export const clientsData: ClientData[] = [
     opp: true,
     refrigerator: true,
     bottle: true,
-    converted: true, // Added conversion status
+    converted: true,
     address: {
       street: "Av. Rebouças, 2000",
       neighborhood: "Pinheiros",
       city: "São Paulo",
       zipCode: "05402-300"
-    }
+    },
+    nextVisit: new Date(2025, 4, 15) // In two weeks
   },
   {
     id: "4",
@@ -71,13 +74,14 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: true,
     bottle: false,
-    converted: true, // Added conversion status
+    converted: true,
     address: {
       street: "Rua Oscar Freire, 300",
       neighborhood: "Jardim Paulista",
       city: "São Paulo",
       zipCode: "01426-000"
-    }
+    },
+    nextVisit: new Date(2025, 4, 10) // In a week
   },
   {
     id: "5",
@@ -86,17 +90,18 @@ export const clientsData: ClientData[] = [
     type: "entretenimento",
     position: { lat: -23.5805, lng: -46.6333 },
     cluster: 10,
-    potential: "ouro",
+    potential: "inox", // Updated to the new tier
     opp: true,
     refrigerator: false,
     bottle: false,
-    converted: false, // Added conversion status
+    converted: false,
     address: {
       street: "Av. Brigadeiro Faria Lima, 1500",
       neighborhood: "Jardim Paulistano",
       city: "São Paulo",
       zipCode: "01452-001"
-    }
+    },
+    nextVisit: new Date(2025, 4, 5) // In three days
   },
   {
     id: "6",
@@ -109,13 +114,14 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: true,
     bottle: true,
-    converted: false, // Added conversion status
+    converted: false,
     address: {
       street: "Av. Paulista, 2000",
       neighborhood: "Bela Vista",
       city: "São Paulo",
       zipCode: "01310-200"
-    }
+    },
+    nextVisit: new Date(2025, 4, 3) // Tomorrow
   },
   {
     id: "7",
@@ -128,13 +134,14 @@ export const clientsData: ClientData[] = [
     opp: false,
     refrigerator: false,
     bottle: false,
-    converted: false, // Added conversion status
+    converted: false,
     address: {
       street: "R. Cel. Fernando Prestes, 100",
       neighborhood: "Centro",
       city: "Itapetininga",
       zipCode: "18200-230"
-    }
+    },
+    nextVisit: new Date(2025, 4, 20) // In three weeks
   }
 ];
 
@@ -166,6 +173,8 @@ export const getCategoryIcon = (category: string): string => {
 // Função para obter a cor do potencial do cliente
 export const getPotentialColor = (potential: string): string => {
   switch (potential) {
+    case "inox":
+      return "bg-tactical-silver"; // Using the #9F9EA1 color already in the palette
     case "diamante":
       return "bg-blue-400";
     case "ouro":
@@ -177,4 +186,42 @@ export const getPotentialColor = (potential: string): string => {
     default:
       return "bg-tactical-silver";
   }
+};
+
+// Function to filter clients by date range
+export const filterClientsByDate = (clients: ClientData[], filter: 'day' | 'week' | 'month'): ClientData[] => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  // Set hours to 0 for consistent date comparison
+  today.setHours(0, 0, 0, 0);
+  
+  return clients.filter(client => {
+    if (!client.nextVisit) return false;
+    
+    const visitDate = new Date(client.nextVisit);
+    visitDate.setHours(0, 0, 0, 0);
+    
+    switch (filter) {
+      case 'day':
+        // Today only
+        return visitDate.getTime() === today.getTime();
+      
+      case 'week':
+        // Next 7 days
+        const weekLater = new Date(today);
+        weekLater.setDate(weekLater.getDate() + 7);
+        return visitDate >= today && visitDate <= weekLater;
+      
+      case 'month':
+        // Next 30 days
+        const monthLater = new Date(today);
+        monthLater.setDate(monthLater.getDate() + 30);
+        return visitDate >= today && visitDate <= monthLater;
+      
+      default:
+        return true;
+    }
+  });
 };

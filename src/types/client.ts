@@ -19,7 +19,8 @@ export type ClientPotential =
   | "bronze"
   | "prata"
   | "ouro"
-  | "diamante";
+  | "diamante"
+  | "inox";  // Added the new "inox" tier
 
 export interface ClientData {
   id: string;
@@ -35,13 +36,14 @@ export interface ClientData {
   opp: boolean;
   refrigerator: boolean;
   bottle: boolean;
-  converted: boolean; // Added conversion status field
+  converted: boolean;
   address: {
     street: string;
     neighborhood: string;
     city: string;
     zipCode: string;
   };
+  nextVisit?: Date; // Added optional next visit date for filtering
 }
 
 export interface ClientMarker {

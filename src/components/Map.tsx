@@ -80,7 +80,7 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
       markers.current[client.id] = marker;
     });
     
-    // Add custom styling to make map match the app theme
+    // Add style for the new inox tier
     const style = document.createElement('style');
     style.textContent = `
       .dark-map-tiles {
@@ -269,8 +269,8 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
       {/* Vignette/border effect */}
       <div className="map-vignette" />
       
-      {/* Legend - moved to bottom left corner */}
-      <div className="absolute bottom-4 left-4 bg-tactical-black/80 border border-heineken/20 p-2 rounded-sm z-10">
+      {/* Client tier legend - moved to top right corner */}
+      <div className="absolute top-4 right-4 bg-tactical-black/80 border border-heineken/20 p-2 rounded-sm z-10">
         <p className="text-xs text-tactical-silver mb-1">Cliente por tier:</p>
         <div className="flex items-center space-x-3">
           <div className="flex items-center">
@@ -288,6 +288,10 @@ const Map: React.FC<MapProps> = ({ className = "" }) => {
           <div className="flex items-center">
             <div className="w-2 h-2 rounded-full bg-blue-400 mr-1" />
             <span className="text-xs text-tactical-silver">Diamante</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-2 h-2 rounded-full bg-tactical-silver mr-1" />
+            <span className="text-xs text-tactical-silver">Inox</span>
           </div>
         </div>
       </div>

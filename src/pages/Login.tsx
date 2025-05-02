@@ -17,26 +17,27 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // For demo purposes, we'll just use a simple validation
-    // In a real app, you would authenticate against your backend
+    // Navigate to the corresponding dashboard based on selected user type
     setTimeout(() => {
       setIsLoading(false);
-      if (username && password) {
-        toast({
-          title: "Missão iniciada!",
-          description: "Bem-vindo ao sistema de comando, agente.",
-          duration: 3000,
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Acesso negado",
-          description: "Credenciais inválidas. Tente novamente.",
-          variant: "destructive",
-          duration: 3000,
-        });
-      }
-    }, 1500);
+      toast({
+        title: "Missão iniciada!",
+        description: `Bem-vindo ao sistema de comando, agente ${userType}.`,
+        duration: 3000,
+      });
+      navigate(`/${userType}/dashboard`);
+    }, 1000);
+  };
+
+  // Direct navigation function for user type buttons
+  const handleDirectNavigation = (type: string) => {
+    setUserType(type);
+    toast({
+      title: "Acesso direto!",
+      description: `Entrando como ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+      duration: 2000,
+    });
+    navigate(`/${type}/dashboard`);
   };
 
   return (
@@ -102,7 +103,7 @@ const Login = () => {
                 <Button
                   type="button"
                   variant={userType === "vendedor" ? "default" : "outline"}
-                  onClick={() => setUserType("vendedor")}
+                  onClick={() => handleDirectNavigation("vendedor")}
                   className={`${userType === "vendedor" ? 'bg-heineken border-heineken' : 'bg-transparent border-heineken/40'} border text-xs h-auto py-1`}
                 >
                   Vendedor
@@ -110,7 +111,7 @@ const Login = () => {
                 <Button
                   type="button"
                   variant={userType === "supervisor" ? "default" : "outline"}
-                  onClick={() => setUserType("supervisor")}
+                  onClick={() => handleDirectNavigation("supervisor")}
                   className={`${userType === "supervisor" ? 'bg-heineken border-heineken' : 'bg-transparent border-heineken/40'} border text-xs h-auto py-1`}
                 >
                   Supervisor
@@ -118,7 +119,7 @@ const Login = () => {
                 <Button
                   type="button"
                   variant={userType === "admin" ? "default" : "outline"}
-                  onClick={() => setUserType("admin")}
+                  onClick={() => handleDirectNavigation("admin")}
                   className={`${userType === "admin" ? 'bg-heineken border-heineken' : 'bg-transparent border-heineken/40'} border text-xs h-auto py-1`}
                 >
                   Admin

@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import Header from "@/components/Header";
 import Map from "@/components/Map";
-import MissionPanel from "@/components/MissionPanel";
+import ClientPanel from "@/components/ClientPanel"; // Updated import
 import ProgressBar from "@/components/ProgressBar";
 import Radar from "@/components/Radar";
 import { Award, Map as MapIcon, Calendar, Target, TrendingUp, Filter, Menu, List, X } from "lucide-react";
@@ -111,7 +110,10 @@ const Dashboard = () => {
                         </TabsList>
                         
                         <TabsContent value="missions" className="mt-0">
-                          <MissionPanel missions={missions} compact={true} />
+                          <ClientPanel 
+                            clients={clientsData} 
+                            compact={true}
+                          />
                         </TabsContent>
                         
                         <TabsContent value="clients" className="mt-0">
@@ -191,7 +193,9 @@ const Dashboard = () => {
               {/* Desktop Main Content */}
               <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-1 order-2 lg:order-1 pointer-events-auto">
-                  <MissionPanel missions={missions} />
+                  <ClientPanel 
+                    clients={clientsData}
+                  />
                 </div>
                 
                 <div className="lg:col-span-3 order-1 lg:order-2 flex flex-col">

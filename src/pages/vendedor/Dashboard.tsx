@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Map from "@/components/Map";
 import Radar from "@/components/Radar";
 import ClientDetailsPanel from "@/components/ClientDetailsPanel";
-import ClientPanel from "@/components/MissionPanel";
+import ClientPanel from "@/components/ClientPanel"; // Updated import
 import MobileClientsList from "@/components/MobileClientsList";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ClientData } from "@/types/client";
@@ -33,12 +33,12 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout userType="vendedor" pageTitle="">
-      {/* Mapa como elemento principal de fundo */}
+      {/* Map as main background element */}
       <div className="absolute inset-0 -mt-12">
         <Map />
       </div>
 
-      {/* Barra de pesquisa centralizada */}
+      {/* Centered search bar */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md">
         <div className="relative">
           <Input
@@ -51,12 +51,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Radar posicionado no canto inferior direito */}
+      {/* Radar positioned in the bottom right */}
       <div className="absolute bottom-8 right-8 z-10">
         <Radar />
       </div>
 
-      {/* Painel de Cliente (flutuante no canto superior direito) */}
+      {/* Client Panel (floating in the upper right) */}
       {selectedClient && (
         <div className={`absolute ${isPanelMinimized ? 'top-4 right-4 w-auto h-auto' : 'top-14 right-4 w-full max-w-sm'} transition-all duration-300 ease-in-out z-20`}>
           {isPanelMinimized ? (
@@ -85,7 +85,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Painel de Clientes (flutuante no canto inferior esquerdo) */}
+      {/* Client Panel (floating in the bottom left) */}
       <div className={`absolute ${isClientPanelMinimized ? 'bottom-4 left-4 w-auto h-auto' : 'bottom-4 left-4 w-full max-w-xs'} transition-all duration-300 ease-in-out z-10`}>
         {isClientPanelMinimized ? (
           <button 
@@ -111,7 +111,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Lista mobile de clientes */}
+      {/* Mobile client list */}
       {isMobile && (
         <MobileClientsList 
           clients={clients}

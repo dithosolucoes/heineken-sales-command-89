@@ -1,4 +1,3 @@
-
 import React from "react";
 import { 
   Dialog, 
@@ -19,7 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ClientCategory, ClientType } from "@/types/client";
+import { ClientCategory, ClientType, ClientPotential } from "@/types/client";
 
 interface ClientDetailsModalProps {
   isOpen: boolean;
@@ -36,7 +35,7 @@ interface ClientDetails {
   cluster: number;
   opp: boolean;
   refrigerator: boolean;
-  potential: "bronze" | "prata" | "ouro" | "diamante";
+  potential: ClientPotential; // Updated to use the ClientPotential type
   bottle: boolean;
   converted: boolean; // Added conversion status
   address: {
@@ -82,6 +81,8 @@ const getPotentialColor = (potential: string) => {
       return "text-tactical-silver";
     case "bronze":
       return "text-tactical-bronze";
+    case "inox": // Added the new "inox" tier
+      return "text-tactical-silver";
     default:
       return "text-tactical-silver";
   }

@@ -84,12 +84,26 @@ const Dashboard = () => {
               >
                 <X size={16} />
               </button>
-              <ClientDetailsModal 
-                isOpen={true} 
-                onClose={() => setSelectedClient(null)} 
-                client={selectedClient}
-                onConfirmConversion={handleConfirmConversion}
-              />
+              <div className="bg-tactical-black border border-heineken/30 rounded-md p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-heineken-neon font-bold">{selectedClient.name}</h3>
+                  <button 
+                    onClick={() => setSelectedClient(null)}
+                    className="text-tactical-silver hover:text-white"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                <p className="text-tactical-silver text-sm mb-2">
+                  {selectedClient.address.street}, {selectedClient.address.neighborhood}
+                </p>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full tactical-button py-2 text-sm"
+                >
+                  VER DETALHES
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -122,7 +136,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Client details modal */}
+      {/* Single client details modal - only this instance should exist */}
       <ClientDetailsModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 

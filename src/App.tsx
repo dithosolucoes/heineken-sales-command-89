@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 
 // Páginas do Vendedor
 import VendedorDashboard from "./pages/vendedor/Dashboard";
+import VendedorRelatorio from "./pages/vendedor/Relatorio";
 
 // Páginas do Supervisor
 import SupervisorDashboard from "./pages/supervisor/Dashboard";
@@ -37,6 +38,7 @@ const App = () => (
           
           {/* Rotas do Vendedor */}
           <Route path="/vendedor/dashboard" element={<VendedorDashboard />} />
+          <Route path="/vendedor/relatorio" element={<VendedorRelatorio />} />
           
           {/* Rotas do Supervisor */}
           <Route path="/supervisor/dashboard" element={<SupervisorDashboard />} />

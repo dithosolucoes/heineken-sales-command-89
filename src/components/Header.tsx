@@ -45,6 +45,7 @@ const Header = ({ userType }: HeaderProps) => {
       default:
         return [
           { name: "Dashboard", href: "/vendedor/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+          { name: "Relatórios", href: "/vendedor/relatorio", icon: <FileText className="h-4 w-4" /> },
         ];
     }
   };

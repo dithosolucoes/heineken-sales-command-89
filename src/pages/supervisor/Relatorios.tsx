@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { 
@@ -33,6 +32,7 @@ import {
   PaginationNext,
   PaginationPrevious
 } from "@/components/ui/pagination";
+import { ExportarRelatorioModal } from "@/components/supervisor/ExportarRelatorioModal";
 
 // Tipo para conversões
 interface Conversao {
@@ -68,6 +68,7 @@ const SupervisorRelatorios = () => {
   const [filtroPeriodo, setFiltroPeriodo] = useState<string>("mes");
   const [conversoesExibidas, setConversoesExibidas] = useState<Conversao[]>([]);
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [exportarModalOpen, setExportarModalOpen] = useState(false);
   const itensPorPagina = 10;
   
   useEffect(() => {
@@ -184,7 +185,10 @@ const SupervisorRelatorios = () => {
 
         <Card className="bg-tactical-darkgray/80 border-heineken/30 sm:w-1/4">
           <CardContent className="flex items-center justify-center p-6">
-            <Button className="w-full bg-heineken hover:bg-heineken/80">
+            <Button 
+              className="w-full bg-heineken hover:bg-heineken/80"
+              onClick={() => setExportarModalOpen(true)}
+            >
               <Download className="mr-2 h-5 w-5" /> Exportar Relatório
             </Button>
           </CardContent>
@@ -342,6 +346,12 @@ const SupervisorRelatorios = () => {
           )}
         </CardContent>
       </Card>
+      
+      {/* Modal de exportação */}
+      <ExportarRelatorioModal 
+        isOpen={exportarModalOpen} 
+        onClose={() => setExportarModalOpen(false)} 
+      />
     </DashboardLayout>
   );
 };

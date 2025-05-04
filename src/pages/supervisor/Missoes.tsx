@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { 
@@ -21,6 +20,7 @@ import {
   Filter,
   Calendar
 } from "lucide-react";
+import { MissaoModal } from "@/components/supervisor/MissaoModal";
 
 // Tipos de missão
 type PrioridadeType = "crítica" | "relevante" | "padrão";
@@ -96,6 +96,10 @@ const SupervisorMissoes = () => {
   const [filtroStatus, setFiltroStatus] = useState<StatusType | "todas">("todas");
   const [filtroVendedor, setFiltroVendedor] = useState<string>("todos");
   const [missoesExibidas, setMissoesExibidas] = useState<Missao[]>(missoesData);
+  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedMissao, setSelectedMissao] = useState<Missao | undefined>(undefined);
 
   useEffect(() => {
     document.title = "Missões | Supervisor Heineken SP SUL";
@@ -118,6 +122,27 @@ const SupervisorMissoes = () => {
     
     setMissoesExibidas(missoesFiltradas);
   }, [filtroStatus, filtroVendedor]);
+
+  // Função para abrir o modal de criar missão
+  const handleOpenCreateModal = () => {
+    setSelectedMissao(undefined);
+    setModalMode('create');
+    setModalOpen(true);
+  };
+
+  // Função para abrir o modal de detalhes de missão
+  const handleOpenDetailsModal = (missao: Missao) => {
+    setSelectedMissao(missao);
+    setModalMode('view');
+    setModalOpen(true);
+  };
+
+  // Função para abrir o modal de edição de missão
+  const handleOpenEditModal = (missao: Missao) => {
+    setSelectedMissao(missao);
+    setModalMode('edit');
+    setModalOpen(true);
+  };
 
   // Função para obter a classe de cor baseada na prioridade
   const getPrioridadeClasses = (prioridade: PrioridadeType) => {
@@ -184,7 +209,10 @@ const SupervisorMissoes = () => {
 
         <Card className="bg-tactical-darkgray/80 border-heineken/30 sm:w-1/3">
           <CardContent className="flex items-center justify-center p-6">
-            <Button className="w-full bg-heineken hover:bg-heineken/80 py-6">
+            <Button 
+              className="w-full bg-heineken hover:bg-heineken/80 py-6"
+              onClick={handleOpenCreateModal}
+            >
               <Plus className="mr-2 h-5 w-5" /> Criar Nova Missão
             </Button>
           </CardContent>
@@ -241,11 +269,20 @@ const SupervisorMissoes = () => {
             </CardContent>
             
             <CardFooter className="pt-2 flex justify-between">
-              <Button variant="outline" size="sm" className="border-heineken/30 text-heineken-neon hover:bg-heineken/20">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-heineken/30 text-heineken-neon hover:bg-heineken/20"
+                onClick={() => handleOpenDetailsModal(missao)}
+              >
                 Detalhes
               </Button>
               {missao.status !== "concluída" && (
-                <Button size="sm" className="bg-heineken hover:bg-heineken/80">
+                <Button 
+                  size="sm" 
+                  className="bg-heineken hover:bg-heineken/80"
+                  onClick={() => handleOpenEditModal(missao)}
+                >
                   {missao.status === "atrasada" ? "Reagendar" : "Atualizar"}
                 </Button>
               )}
@@ -272,6 +309,14 @@ const SupervisorMissoes = () => {
           </div>
         )}
       </div>
+
+      {/* Modal para criar/editar/visualizar missões */}
+      <MissaoModal 
+        isOpen={modalOpen} 
+        onClose={() => setModalOpen(false)}
+        missao={selectedMissao}
+        mode={modalMode}
+      />
     </DashboardLayout>
   );
 };

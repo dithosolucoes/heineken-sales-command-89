@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { 
@@ -26,6 +25,7 @@ import {
   ListFilter
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ImportarPlanilhaModal } from "@/components/supervisor/ImportarPlanilhaModal";
 
 // Dados simulados para rotas
 const rotasData = [
@@ -73,6 +73,7 @@ const rotasData = [
 
 const SupervisorRotas = () => {
   const [selectedVendedor, setSelectedVendedor] = useState<string | null>(null);
+  const [importarModalOpen, setImportarModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Rotas | Supervisor Heineken SP SUL";
@@ -94,7 +95,10 @@ const SupervisorRotas = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full bg-heineken hover:bg-heineken/80">
+            <Button 
+              className="w-full bg-heineken hover:bg-heineken/80"
+              onClick={() => setImportarModalOpen(true)}
+            >
               <Upload className="mr-2 h-4 w-4" /> Importar Planilha
             </Button>
           </CardFooter>
@@ -222,6 +226,12 @@ const SupervisorRotas = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Modal para importação de planilha */}
+      <ImportarPlanilhaModal 
+        isOpen={importarModalOpen} 
+        onClose={() => setImportarModalOpen(false)} 
+      />
     </DashboardLayout>
   );
 };

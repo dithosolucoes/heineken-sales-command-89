@@ -1,5 +1,4 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import StatsCard from "@/components/ui/stats-card";
 import { 
@@ -23,6 +22,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { MetasModal } from "@/components/supervisor/MetasModal";
 
 // Dados simulados para o supervisor
 const vendedoresData = [
@@ -34,6 +34,8 @@ const vendedoresData = [
 ];
 
 const SupervisorDashboard = () => {
+  const [metasModalOpen, setMetasModalOpen] = useState(false);
+  
   useEffect(() => {
     document.title = "Dashboard Supervisor | Heineken SP SUL";
   }, []);
@@ -72,7 +74,12 @@ const SupervisorDashboard = () => {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-medium">Desempenho da Equipe</CardTitle>
-              <Button variant="outline" size="sm" className="border-heineken text-heineken-neon hover:bg-heineken/20">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-heineken text-heineken-neon hover:bg-heineken/20"
+                onClick={() => setMetasModalOpen(true)}
+              >
                 Cadastrar Metas
               </Button>
             </div>
@@ -154,6 +161,9 @@ const SupervisorDashboard = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Modais */}
+      <MetasModal isOpen={metasModalOpen} onClose={() => setMetasModalOpen(false)} />
     </DashboardLayout>
   );
 };

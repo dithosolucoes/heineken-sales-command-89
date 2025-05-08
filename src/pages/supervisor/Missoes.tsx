@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { MissaoModal } from "@/components/supervisor/MissaoModal";
+import { MissaoModal } from "@/components/supervisor/missoes/MissaoModal";
 import { MissoesFiltersCard } from "@/components/supervisor/missoes/MissoesFiltersCard";
 import { NovaMissaoCard } from "@/components/supervisor/missoes/NovaMissaoCard";
 import { MissaoCard } from "@/components/supervisor/missoes/MissaoCard";

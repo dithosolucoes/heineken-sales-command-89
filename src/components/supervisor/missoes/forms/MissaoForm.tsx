@@ -1,11 +1,28 @@
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PrioridadeType, StatusType } from "@/types/missao";
+import { Calendar } from "lucide-react";
+import { missaoFormSchema, MissaoFormValues } from "./MissaoFormSchema";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEffect } from "react";
 
 interface MissaoFormProps {
   isViewOnly?: boolean;
@@ -30,129 +47,227 @@ interface MissaoFormProps {
   isEditMode?: boolean;
 }
 
-export function MissaoForm({ 
+export function MissaoForm({
   isViewOnly = false,
   initialData,
   onChange,
-  isEditMode = false
+  isEditMode = false,
 }: MissaoFormProps) {
-  return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="titulo" className="text-tactical-silver">Título da Missão</Label>
-        <Input
-          id="titulo"
-          value={initialData.titulo}
-          onChange={(e) => onChange.setTitulo(e.target.value)}
-          className="bg-tactical-black border-heineken/30"
-          placeholder="Ex: Aumentar presença de marca no PDV #342"
-          disabled={isViewOnly}
-        />
-      </div>
-      
-      <div>
-        <Label htmlFor="vendedor" className="text-tactical-silver">Vendedor Responsável</Label>
-        <Select 
-          value={initialData.vendedor} 
-          onValueChange={onChange.setVendedor}
-          disabled={isViewOnly}
-        >
-          <SelectTrigger className="bg-tactical-black border-heineken/30 w-full">
-            <SelectValue placeholder="Selecione um vendedor" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Carlos Silva">Carlos Silva</SelectItem>
-            <SelectItem value="Ana Duarte">Ana Duarte</SelectItem>
-            <SelectItem value="Bruno Santos">Bruno Santos</SelectItem>
-            <SelectItem value="Mariana Costa">Mariana Costa</SelectItem>
-            <SelectItem value="Pedro Lima">Pedro Lima</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+  const form = useForm<MissaoFormValues>({
+    resolver: zodResolver(missaoFormSchema),
+    defaultValues: {
+      titulo: initialData.titulo,
+      vendedor: initialData.vendedor,
+      prioridade: initialData.prioridade,
+      prazo: initialData.prazo,
+      descricao: initialData.descricao,
+      progresso: initialData.progresso,
+      status: initialData.status,
+    },
+  });
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="prioridade" className="text-tactical-silver">Prioridade</Label>
-          <Select 
-            value={initialData.prioridade} 
-            onValueChange={onChange.setPrioridade}
-            disabled={isViewOnly}
-          >
-            <SelectTrigger className="bg-tactical-black border-heineken/30 w-full">
-              <SelectValue placeholder="Selecione a prioridade" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="crítica">Crítica</SelectItem>
-              <SelectItem value="relevante">Relevante</SelectItem>
-              <SelectItem value="padrão">Padrão</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+  // Update parent component state when form values change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (value.titulo !== undefined) onChange.setTitulo(value.titulo);
+      if (value.vendedor !== undefined) onChange.setVendedor(value.vendedor);
+      if (value.prioridade !== undefined) onChange.setPrioridade(value.prioridade);
+      if (value.prazo !== undefined) onChange.setPrazo(value.prazo);
+      if (value.descricao !== undefined) onChange.setDescricao(value.descricao);
+      if (value.progresso !== undefined && onChange.setProgresso) onChange.setProgresso(value.progresso);
+      if (value.status !== undefined && onChange.setStatus) onChange.setStatus(value.status);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, onChange]);
+
+  // Update form when initialData changes
+  useEffect(() => {
+    form.reset({
+      titulo: initialData.titulo,
+      vendedor: initialData.vendedor,
+      prioridade: initialData.prioridade,
+      prazo: initialData.prazo,
+      descricao: initialData.descricao,
+      progresso: initialData.progresso,
+      status: initialData.status,
+    });
+  }, [initialData, form.reset]);
+
+  return (
+    <Form {...form}>
+      <form className="space-y-4">
+        <FormField
+          control={form.control}
+          name="titulo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-tactical-silver">Título da Missão</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  className="bg-tactical-black border-heineken/30"
+                  placeholder="Ex: Aumentar presença de marca no PDV #342"
+                  disabled={isViewOnly}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
-        <div>
-          <Label htmlFor="prazo" className="text-tactical-silver flex items-center">
-            <Calendar className="h-4 w-4 mr-1" />
-            Prazo
-          </Label>
-          <Input
-            id="prazo"
-            type="date"
-            value={initialData.prazo}
-            onChange={(e) => onChange.setPrazo(e.target.value)}
-            className="bg-tactical-black border-heineken/30"
-            disabled={isViewOnly}
+        <FormField
+          control={form.control}
+          name="vendedor"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-tactical-silver">Vendedor Responsável</FormLabel>
+              <Select
+                value={field.value}
+                onValueChange={field.onChange}
+                disabled={isViewOnly}
+              >
+                <FormControl>
+                  <SelectTrigger className="bg-tactical-black border-heineken/30 w-full">
+                    <SelectValue placeholder="Selecione um vendedor" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Carlos Silva">Carlos Silva</SelectItem>
+                  <SelectItem value="Ana Duarte">Ana Duarte</SelectItem>
+                  <SelectItem value="Bruno Santos">Bruno Santos</SelectItem>
+                  <SelectItem value="Mariana Costa">Mariana Costa</SelectItem>
+                  <SelectItem value="Pedro Lima">Pedro Lima</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="prioridade"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-tactical-silver">Prioridade</FormLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isViewOnly}
+                >
+                  <FormControl>
+                    <SelectTrigger className="bg-tactical-black border-heineken/30 w-full">
+                      <SelectValue placeholder="Selecione a prioridade" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="crítica">Crítica</SelectItem>
+                    <SelectItem value="relevante">Relevante</SelectItem>
+                    <SelectItem value="padrão">Padrão</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="prazo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-tactical-silver flex items-center">
+                  <Calendar className="h-4 w-4 mr-1" />
+                  Prazo
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="date"
+                    className="bg-tactical-black border-heineken/30"
+                    disabled={isViewOnly}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
-      </div>
-      
-      {(isEditMode || isViewOnly) && onChange.setStatus && onChange.setProgresso && (
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="status" className="text-tactical-silver">Status</Label>
-            <Select 
-              value={initialData.status} 
-              onValueChange={onChange.setStatus}
-              disabled={isViewOnly}
-            >
-              <SelectTrigger className="bg-tactical-black border-heineken/30 w-full">
-                <SelectValue placeholder="Selecione o status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ativa">Ativa</SelectItem>
-                <SelectItem value="concluída">Concluída</SelectItem>
-                <SelectItem value="atrasada">Atrasada</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div>
-            <Label htmlFor="progresso" className="text-tactical-silver">Progresso (%)</Label>
-            <Input
-              id="progresso"
-              type="number"
-              min="0"
-              max="100"
-              value={initialData.progresso}
-              onChange={(e) => onChange.setProgresso(e.target.value)}
-              className="bg-tactical-black border-heineken/30"
-              disabled={isViewOnly}
+
+        {(isEditMode || isViewOnly) && onChange.setStatus && onChange.setProgresso && (
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-tactical-silver">Status</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isViewOnly}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="bg-tactical-black border-heineken/30 w-full">
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="ativa">Ativa</SelectItem>
+                      <SelectItem value="concluída">Concluída</SelectItem>
+                      <SelectItem value="atrasada">Atrasada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="progresso"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-tactical-silver">Progresso (%)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      min="0"
+                      max="100"
+                      className="bg-tactical-black border-heineken/30"
+                      disabled={isViewOnly}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
-        </div>
-      )}
-      
-      <div>
-        <Label htmlFor="descricao" className="text-tactical-silver">Descrição</Label>
-        <Textarea
-          id="descricao"
-          value={initialData.descricao}
-          onChange={(e) => onChange.setDescricao(e.target.value)}
-          className="bg-tactical-black border-heineken/30"
-          placeholder="Detalhes sobre a missão e o que deve ser feito..."
-          rows={4}
-          disabled={isViewOnly}
+        )}
+
+        <FormField
+          control={form.control}
+          name="descricao"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-tactical-silver">Descrição</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  className="bg-tactical-black border-heineken/30"
+                  placeholder="Detalhes sobre a missão e o que deve ser feito..."
+                  rows={4}
+                  disabled={isViewOnly}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-    </div>
+      </form>
+    </Form>
   );
 }

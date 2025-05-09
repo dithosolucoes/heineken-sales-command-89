@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import StatsCard from "@/components/ui/stats-card";
@@ -23,6 +24,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { MetasModal } from "@/components/supervisor/MetasModal";
+import Map from "@/components/Map";
 
 // Dados simulados para o supervisor
 const vendedoresData = [
@@ -35,10 +37,16 @@ const vendedoresData = [
 
 const SupervisorDashboard = () => {
   const [metasModalOpen, setMetasModalOpen] = useState(false);
+  const [selectedVendedor, setSelectedVendedor] = useState<string | null>(null);
   
   useEffect(() => {
     document.title = "Dashboard Supervisor | Heineken SP SUL";
   }, []);
+
+  // Function to handle vendor selection for map filtering
+  const handleSelectVendedor = (vendedorNome: string) => {
+    setSelectedVendedor(selectedVendedor === vendedorNome ? null : vendedorNome);
+  };
 
   return (
     <DashboardLayout userType="supervisor" pageTitle="Dashboard do Supervisor">
@@ -97,8 +105,18 @@ const SupervisorDashboard = () => {
               </TableHeader>
               <TableBody>
                 {vendedoresData.map((vendedor) => (
-                  <TableRow key={vendedor.id}>
-                    <TableCell className="font-medium">{vendedor.nome}</TableCell>
+                  <TableRow 
+                    key={vendedor.id}
+                    className={selectedVendedor === vendedor.nome ? "bg-heineken/10" : ""}
+                    onClick={() => handleSelectVendedor(vendedor.nome)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <TableCell className="font-medium">
+                      {vendedor.nome}
+                      {selectedVendedor === vendedor.nome && (
+                        <span className="ml-2 text-xs text-heineken-neon">(Selecionado)</span>
+                      )}
+                    </TableCell>
                     <TableCell>{vendedor.metas}</TableCell>
                     <TableCell>{vendedor.visitas}</TableCell>
                     <TableCell>{vendedor.conversoes}</TableCell>
@@ -150,14 +168,27 @@ const SupervisorDashboard = () => {
 
       <Card className="bg-tactical-darkgray/80 border-heineken/30">
         <CardHeader>
-          <CardTitle className="text-lg font-medium">Mapa de PDVs por Vendedor</CardTitle>
+          <CardTitle className="text-lg font-medium">
+            Mapa de PDVs por Vendedor
+            {selectedVendedor && (
+              <span className="ml-2 text-sm font-normal text-heineken-neon">
+                - Visualizando: {selectedVendedor}
+              </span>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[400px] tactical-panel relative overflow-hidden rounded">
-            {/* Aqui podemos reutilizar o componente Map, mas com uma configuração para o supervisor */}
-            <div className="absolute inset-0 flex items-center justify-center bg-tactical-black/70">
-              <p className="text-heineken-neon">Mapa com PDVs segmentados por vendedor</p>
-            </div>
+            {selectedVendedor ? (
+              <Map 
+                className="pointer-events-auto" 
+                vendedorFilter={selectedVendedor} 
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-tactical-black/70">
+                <p className="text-heineken-neon">Selecione um vendedor na tabela acima para visualizar seus PDVs no mapa</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

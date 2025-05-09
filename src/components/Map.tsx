@@ -3,7 +3,7 @@ import { MapPin, Store, Search, Gamepad, Utensils, Coffee, ShoppingBag } from "l
 import { Input } from "@/components/ui/input";
 import ClientDetailsModal from "./ClientDetailsModal";
 import { clientsData, getPotentialColor } from "@/utils/clientData";
-import { ClientData } from "@/types/client";
+import { ClientData, ClientDetails } from "@/types/client";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -24,7 +24,7 @@ const Map: React.FC<MapProps> = ({
   onSelectClient,
   vendedorFilter
 }) => {
-  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
+  const [selectedClient, setSelectedClient] = useState<ClientDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const mapRef = useRef<HTMLDivElement>(null);
@@ -276,7 +276,28 @@ const Map: React.FC<MapProps> = ({
     if (onSelectClient) {
       onSelectClient(client);
     } else {
-      setSelectedClient(client as any); // Use type assertion para resolver o problema temporariamente
+      // Create a valid ClientDetails object from ClientData
+      const clientDetails: ClientDetails = {
+        id: client.id,
+        name: client.name,
+        category: client.category || 'Bar C/D', // Default value if not provided
+        type: client.type,
+        cluster: client.cluster || 1, // Default value if not provided
+        opp: client.opp || false, // Default value if not provided
+        refrigerator: client.refrigerator || false, // Default value if not provided
+        potential: client.potential,
+        bottle: client.bottle || false, // Default value if not provided
+        converted: client.converted || false, // Default value if not provided
+        address: {
+          street: client.address.street,
+          neighborhood: client.address.neighborhood,
+          city: client.address.city,
+          zipCode: client.address.zipcode
+        },
+        position: client.position
+      };
+      
+      setSelectedClient(clientDetails);
       setIsModalOpen(true);
     }
   };

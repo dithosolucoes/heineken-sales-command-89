@@ -2,7 +2,7 @@
 // Definindo os tipos necessários para o componente ClientDetailsModal
 export type ClientCategory = 'Armazém/mercearia' | 'Restaurante C/D' | 'Bar C/D' | 'Padaria/confeitaria' | 'Entretenimento Espec' | 'Lanchonete';
 export type ClientType = 'bar' | 'restaurante' | 'mercado' | 'padaria' | 'lanchonete' | 'entretenimento';
-export type ClientPotential = 'bronze' | 'prata' | 'ouro' | 'diamante' | 'inox';
+export type ClientPotential = 'bronze' | 'prata' | 'ouro' | 'diamante' | 'inox' | 'silver' | 'gold' | 'diamond';
 
 export interface ClientData {
   id: string;

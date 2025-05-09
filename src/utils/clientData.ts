@@ -5,13 +5,18 @@ import { ClientData } from "@/types/client";
 export const getPotentialColor = (potential: ClientData['potential']): string => {
   switch (potential) {
     case 'gold':
+    case 'ouro':
       return 'bg-tactical-gold';
     case 'silver':
+    case 'prata':
       return 'bg-tactical-silver';
     case 'bronze':
       return 'bg-tactical-bronze';
     case 'diamond':
+    case 'diamante':
       return 'bg-blue-400';
+    case 'inox':
+      return 'bg-tactical-silver';
     default:
       return 'bg-tactical-silver';
   }

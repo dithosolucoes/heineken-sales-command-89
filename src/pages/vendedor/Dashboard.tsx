@@ -5,7 +5,7 @@ import Radar from "@/components/Radar";
 import ClientPanel from "@/components/ClientPanel";
 import MobileClientsList from "@/components/MobileClientsList";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ClientData } from "@/types/client";
+import { ClientData, ClientDetails } from "@/types/client";
 import { clientsData } from "@/utils/clientData";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Search, Filter, X } from "lucide-react";
@@ -15,7 +15,7 @@ import ClientDetailsModal from "@/components/ClientDetailsModal";
 const Dashboard = () => {
   const isMobile = useIsMobile();
   const [clients] = useState<ClientData[]>(clientsData);
-  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
+  const [selectedClient, setSelectedClient] = useState<ClientDetails | null>(null);
   const [hoveredClient, setHoveredClient] = useState<ClientData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,7 +27,28 @@ const Dashboard = () => {
   }, []);
 
   const handleClientSelect = (client: ClientData) => {
-    setSelectedClient(client);
+    // Create a proper ClientDetails object from ClientData
+    const clientDetails: ClientDetails = {
+      id: client.id,
+      name: client.name,
+      category: client.category || 'Bar C/D', // Default value if not provided
+      type: client.type,
+      cluster: client.cluster || 1, // Default value if not provided
+      opp: client.opp || false, // Default value if not provided
+      refrigerator: client.refrigerator || false, // Default value if not provided
+      potential: client.potential,
+      bottle: client.bottle || false, // Default value if not provided
+      converted: client.converted || false, // Default value if not provided
+      address: {
+        street: client.address.street,
+        neighborhood: client.address.neighborhood,
+        city: client.address.city,
+        zipCode: client.address.zipcode
+      },
+      position: client.position
+    };
+    
+    setSelectedClient(clientDetails);
     setIsModalOpen(true);
   };
 

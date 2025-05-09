@@ -1,8 +1,10 @@
+
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Map from "@/components/Map";
 import Radar from "@/components/Radar";
 import ClientPanel from "@/components/ClientPanel";
+import MissionPanel from "@/components/MissionPanel";
 import MobileClientsList from "@/components/MobileClientsList";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ClientData, ClientDetails } from "@/types/client";
@@ -11,6 +13,7 @@ import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ClientDetailsModal from "@/components/ClientDetailsModal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Dashboard = () => {
   const isMobile = useIsMobile();
@@ -21,6 +24,7 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
   const [isClientPanelMinimized, setIsClientPanelMinimized] = useState(false);
+  const [activeTab, setActiveTab] = useState<"clients" | "missions">("clients");
 
   useEffect(() => {
     document.title = "Dashboard | Heineken SP SUL";
@@ -129,14 +133,14 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Client Panel (floating in the bottom left) */}
+      {/* Client/Mission Panel (floating in the bottom left) */}
       <div className={`absolute ${isClientPanelMinimized ? 'bottom-4 left-4 w-auto h-auto' : 'bottom-4 left-4 w-full max-w-xs'} transition-all duration-300 ease-in-out z-10`}>
         {isClientPanelMinimized ? (
           <button 
             onClick={() => setIsClientPanelMinimized(false)}
             className="tactical-button p-2 rounded-md"
           >
-            <span className="text-xs">Próximos atendimentos</span>
+            <span className="text-xs">Ver painéis</span>
           </button>
         ) : (
           <div className="relative animate-tactical-fade">
@@ -146,12 +150,32 @@ const Dashboard = () => {
             >
               <X size={16} />
             </button>
-            <ClientPanel 
-              clients={clients} 
-              onSelectClient={handleClientSelect}
-              onHoverClient={setHoveredClient}
-              compact={isMobile} 
-            />
+            
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "clients" | "missions")} className="w-full">
+              <TabsList className="w-full bg-tactical-darkgray/50 border border-heineken/20 mb-2">
+                <TabsTrigger value="clients" className="flex-1 data-[state=active]:bg-heineken data-[state=active]:text-white">
+                  Atendimentos
+                </TabsTrigger>
+                <TabsTrigger value="missions" className="flex-1 data-[state=active]:bg-heineken data-[state=active]:text-white">
+                  Missões
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="clients" className="mt-0 h-[400px]">
+                <ClientPanel 
+                  clients={clients} 
+                  onSelectClient={handleClientSelect}
+                  onHoverClient={setHoveredClient}
+                  compact={isMobile} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="missions" className="mt-0 h-[400px]">
+                <MissionPanel 
+                  compact={isMobile}
+                />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </div>

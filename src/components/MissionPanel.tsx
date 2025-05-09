@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Calendar, CalendarDays, CalendarRange, Store, MapPin } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ClientData } from "@/types/client";
+import { ClientData, ClientPotential } from "@/types/client";
 import { getPotentialColor } from "@/utils/clientData";
 
 interface ClientPanelProps {

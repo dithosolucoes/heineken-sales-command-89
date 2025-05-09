@@ -276,7 +276,7 @@ const Map: React.FC<MapProps> = ({
     if (onSelectClient) {
       onSelectClient(client);
     } else {
-      setSelectedClient(client);
+      setSelectedClient(client as any); // Use type assertion para resolver o problema temporariamente
       setIsModalOpen(true);
     }
   };

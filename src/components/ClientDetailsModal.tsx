@@ -18,36 +18,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ClientCategory, ClientType, ClientPotential } from "@/types/client";
+import { ClientCategory, ClientType, ClientPotential, ClientDetails } from "@/types/client";
 
 interface ClientDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   client: ClientDetails | null;
   onConfirmConversion?: (clientId: string) => void;
-}
-
-interface ClientDetails {
-  id: string;
-  name: string;
-  category: ClientCategory;
-  type: ClientType;
-  cluster: number;
-  opp: boolean;
-  refrigerator: boolean;
-  potential: ClientPotential; // Updated to use the ClientPotential type
-  bottle: boolean;
-  converted: boolean; // Added conversion status
-  address: {
-    street: string;
-    neighborhood: string;
-    city: string;
-    zipCode: string;
-  };
-  position: {
-    lat: number;
-    lng: number;
-  };
 }
 
 // Função para obter o ícone baseado na categoria

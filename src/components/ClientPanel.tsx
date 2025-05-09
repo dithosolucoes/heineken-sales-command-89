@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Calendar, Store, MapPin } from "lucide-react";
-import { ClientData } from "@/types/client";
+import { ClientData, ClientPotential } from "@/types/client";
 import { getPotentialColor } from "@/utils/clientData";
 import { 
   Select,

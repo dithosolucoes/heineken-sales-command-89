@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, Clock, CalendarIcon, Filter } from "lucide-react";
+import { Check, X, Clock, CalendarIcon, Filter, BarChart3 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
@@ -26,6 +26,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { GraficoConversoes } from "@/components/vendedor/relatorios/GraficoConversoes";
+import { StatusFilter } from "@/components/vendedor/relatorios/StatusFilter";
 
 // Tipo para conversões do vendedor
 interface Conversao {
@@ -102,13 +106,14 @@ const VendedorRelatorio = () => {
   );
   const [dataFim, setDataFim] = useState<Date | undefined>(new Date());
   const [conversoesFiltradas, setConversoesFiltradas] = useState<Conversao[]>([]);
+  const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   
   useEffect(() => {
     document.title = "Relatórios | Vendedor Heineken SP SUL";
     filtrarConversoes();
-  }, [dataInicio, dataFim]);
+  }, [dataInicio, dataFim, filtroStatus]);
   
-  // Função para filtrar as conversões por data
+  // Função para filtrar as conversões por data e status
   const filtrarConversoes = () => {
     let resultado = [...conversoesMockData];
     
@@ -118,6 +123,11 @@ const VendedorRelatorio = () => {
     
     if (dataFim) {
       resultado = resultado.filter(c => c.data <= dataFim);
+    }
+    
+    // Filtrar por status, se um status específico for selecionado
+    if (filtroStatus !== "todos") {
+      resultado = resultado.filter(c => c.status === filtroStatus);
     }
     
     // Ordenar por data, da mais recente para a mais antiga
@@ -130,6 +140,7 @@ const VendedorRelatorio = () => {
   const resetarFiltros = () => {
     setDataInicio(new Date(new Date().setDate(new Date().getDate() - 30)));
     setDataFim(new Date());
+    setFiltroStatus("todos");
   };
   
   // Função para renderizar o ícone de status
@@ -169,6 +180,19 @@ const VendedorRelatorio = () => {
       default:
         return "bg-gray-500/20 text-gray-400";
     }
+  };
+
+  // Dados para gráficos de status
+  const contarConversoesPorStatus = () => {
+    const confirmadas = conversoesFiltradas.filter(c => c.status === "confirmado").length;
+    const pendentes = conversoesFiltradas.filter(c => c.status === "pendente").length;
+    const revertidas = conversoesFiltradas.filter(c => c.status === "revertido").length;
+    
+    return [
+      { name: 'Confirmadas', value: confirmadas, fill: '#22c55e' },
+      { name: 'Pendentes', value: pendentes, fill: '#94a3b8' },
+      { name: 'Revertidas', value: revertidas, fill: '#ef4444' },
+    ];
   };
 
   return (
@@ -241,6 +265,11 @@ const VendedorRelatorio = () => {
               </Popover>
             </div>
             
+            <StatusFilter 
+              filtroStatus={filtroStatus} 
+              setFiltroStatus={setFiltroStatus} 
+            />
+            
             <div className="flex-1 flex items-end">
               <Button 
                 className="w-full bg-heineken hover:bg-heineken/80"
@@ -251,6 +280,8 @@ const VendedorRelatorio = () => {
             </div>
           </CardContent>
         </Card>
+        
+        <GraficoConversoes dadosConversoes={contarConversoesPorStatus()} />
         
         <Card className="bg-tactical-darkgray/80 border-heineken/30">
           <CardHeader className="pb-2">

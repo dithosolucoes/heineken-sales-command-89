@@ -180,10 +180,12 @@ const SupervisorDashboard = () => {
         <CardContent>
           <div className="h-[400px] tactical-panel relative overflow-hidden rounded">
             {selectedVendedor ? (
-              <Map 
-                className="pointer-events-auto" 
-                vendedorFilter={selectedVendedor} 
-              />
+              <div className="absolute inset-0 z-0">
+                <Map 
+                  className="w-full h-full pointer-events-auto" 
+                  vendedorFilter={selectedVendedor} 
+                />
+              </div>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-tactical-black/70">
                 <p className="text-heineken-neon">Selecione um vendedor na tabela acima para visualizar seus PDVs no mapa</p>

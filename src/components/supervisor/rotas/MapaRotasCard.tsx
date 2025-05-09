@@ -21,10 +21,12 @@ export const MapaRotasCard = ({ selectedVendedor }: MapaRotasCardProps) => {
       <CardContent>
         <div className="h-[500px] tactical-panel relative overflow-hidden rounded">
           {selectedVendedor ? (
-            <Map 
-              className="pointer-events-auto" 
-              vendedorFilter={selectedVendedor} 
-            />
+            <div className="absolute inset-0 z-0">
+              <Map 
+                className="w-full h-full pointer-events-auto" 
+                vendedorFilter={selectedVendedor} 
+              />
+            </div>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-tactical-black/70">
               <div className="text-center">

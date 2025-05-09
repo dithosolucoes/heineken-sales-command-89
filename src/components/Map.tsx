@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { MapPin, Store, Search, Gamepad, Utensils, Coffee, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -16,12 +15,14 @@ interface MapProps {
   className?: string;
   highlightedClientId?: string;
   onSelectClient?: (client: ClientData) => void;
+  vendedorFilter?: string; // Nova prop para filtrar por vendedor
 }
 
 const Map: React.FC<MapProps> = ({ 
   className = "", 
   highlightedClientId, 
-  onSelectClient 
+  onSelectClient,
+  vendedorFilter
 }) => {
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,7 +69,11 @@ const Map: React.FC<MapProps> = ({
     }).addTo(leafletMap.current);
     
     // Add client markers
-    clientsData.forEach(client => {
+    const filteredClients = vendedorFilter 
+      ? clientsData.filter(client => client.vendedor === vendedorFilter)
+      : clientsData;
+      
+    filteredClients.forEach(client => {
       // Create custom icon based on client potential and category
       const markerIcon = createClientIcon(client);
       
@@ -219,7 +224,7 @@ const Map: React.FC<MapProps> = ({
       window.removeEventListener('resize', handleResize);
       document.head.removeChild(style);
     };
-  }, []);
+  }, [vendedorFilter]); // Add vendedorFilter as a dependency
 
   // Effect for highlighting markers when hovering over client cards
   useEffect(() => {
@@ -347,6 +352,15 @@ const Map: React.FC<MapProps> = ({
           client={selectedClient}
           onConfirmConversion={handleConfirmConversion}
         />
+      )}
+      
+      {/* Vendor filter indicator when a filter is active */}
+      {vendedorFilter && (
+        <div className="absolute top-4 left-4 bg-tactical-black/80 border border-heineken/20 p-2 rounded-sm z-10">
+          <p className="text-xs text-heineken-neon">
+            Vendedor: {vendedorFilter}
+          </p>
+        </div>
       )}
     </div>
   );
